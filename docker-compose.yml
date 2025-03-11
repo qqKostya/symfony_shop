@@ -1,5 +1,4 @@
 version: "3.8"
-
 services:
   app:
     build: .
@@ -28,22 +27,19 @@ services:
       - shop-net
 
   db:
-    image: postgres:15
-    container_name: shop-api-db
-    restart: unless-stopped
+    image: postgres:${POSTGRES_VERSION:-16}-alpine
     environment:
-      POSTGRES_DB: shop
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: secret
-    ports:
-      - "5432:5432"
+      POSTGRES_DB: ${POSTGRES_DB:-app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
+      POSTGRES_USER: ${POSTGRES_USER:-app}
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data:rw
     networks:
-      - shop-net
+      - shop-net  # Убедитесь, что сервис db подключен к сети shop-net
 
 networks:
   shop-net:
+    driver: bridge
 
 volumes:
   pgdata:

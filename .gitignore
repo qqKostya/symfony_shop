@@ -206,3 +206,4 @@ fabric.properties
 /web/js/
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,phpstorm,symfony
+.env
