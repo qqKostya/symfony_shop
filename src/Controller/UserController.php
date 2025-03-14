@@ -14,14 +14,20 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+
 
 class UserController extends AbstractController
 {
-    private Serializer $serializer;
+    // private Serializer $serializer;
+    private SerializerInterface $serializer;
+    private JWTTokenManagerInterface $jwtManager;
 
-    public function __construct()
+    public function __construct(SerializerInterface $serializer, JWTTokenManagerInterface $jwtManager)
     {
-        $this->serializer = new Serializer([new DateTimeNormalizer(), new ObjectNormalizer()], [new JsonEncoder()]);
+        // $this->serializer = new Serializer([new DateTimeNormalizer(), new ObjectNormalizer()], [new JsonEncoder()]);
+        $this->serializer = $serializer;
+        $this->jwtManager = $jwtManager;
     }
 
     #[Route('/api/users', name: 'api_user_list', methods: ['GET'])]
@@ -41,7 +47,7 @@ class UserController extends AbstractController
         return new JsonResponse($this->serializer->normalize($user, null, ['groups' => 'user:read']), Response::HTTP_OK);
     }
 
-    #[Route('/api/users', name: 'api_user_create', methods: ['POST'])]
+    #[Route('/api/register', name: 'api_user_create', methods: ['POST'])]
     public function create(Request $request, EntityManagerInterface $em): Response
     {
         $data = json_decode($request->getContent(), true);
@@ -104,5 +110,31 @@ class UserController extends AbstractController
         $em->flush();
 
         return new JsonResponse(['message' => 'User deleted successfully'], Response::HTTP_NO_CONTENT);
+    }
+
+    #[Route('/api/login', name: 'api_user_login', methods: ['POST'])]
+    public function login(Request $request, EntityManagerInterface $em): Response
+    {
+        $data = json_decode($request->getContent(), true);
+
+        if (empty($data['email']) || empty($data['password'])) {
+            return new JsonResponse(['error' => 'Email and password required'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $user = $em->getRepository(User::class)->findOneBy(['email' => $data['email']]);
+
+        if (!$user) {
+            return new JsonResponse(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        // TODO: add password hasher
+        // if (!$this->passwordEncoder->isPasswordValid($user, $data['password'])) {
+        if (password_verify($data['password'], $user->getPasswordHash()) === false) {
+            return new JsonResponse(['error' => 'Invalid credentials'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $token = $this->jwtManager->create($user);
+
+        return new JsonResponse(['token' => $token], Response::HTTP_OK);
     }
 }

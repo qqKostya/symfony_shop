@@ -6,15 +6,17 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\SerializedName;
-
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ORM\Entity]
 #[ORM\Table(name: "users")]
-class User
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: "integer")]
+    #[Groups(['user:read'])]
     private int $id;
 
     #[ORM\Column(type: "string", length: 255)]
@@ -47,7 +49,6 @@ class User
     #[Groups(['user:read'])]
     #[SerializedName('updatedAt')]
     private \DateTime $updatedAt;
-
 
     public function __construct()
     {
@@ -127,5 +128,27 @@ class User
     {
         $this->updatedAt = $updatedAt;
         return $this;
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->email;
+    }
+
+    public function getRoles(): array
+    {
+        return ['admin'];
+    }
+
+    public function getSalt(): ?string
+    {
+        return null;
+    }
+
+    public function eraseCredentials() {}
+
+    public function getPassword(): ?string
+    {
+        return $this->passwordHash;
     }
 }
