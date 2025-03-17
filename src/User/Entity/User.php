@@ -4,12 +4,12 @@ namespace App\User\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-//use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Validator\Constraints as Assert;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity]
 #[ORM\Table(name: "users")]
@@ -17,6 +17,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     private const READ = 'user:read';
     private const WRITE = 'user:write';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]
@@ -44,23 +45,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups([self::WRITE])]
     private string $passwordHash;
 
-    #[ORM\Column(type: "datetime")]
-//    #[Gedmo\Timestampable(on: "create")]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Gedmo\Timestampable(on: "create")]
     #[Groups([self::READ])]
     #[SerializedName('createdAt')]
     private \DateTime $createdAt;
 
-    #[ORM\Column(type: "datetime")]
-//    #[Gedmo\Timestampable(on: "update")]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Gedmo\Timestampable(on: "update")]
     #[Groups([self::READ])]
     #[SerializedName('updatedAt')]
     private \DateTime $updatedAt;
 
-    public function __construct()
-    {
-      $this->createdAt = new \DateTime();
-      $this->updatedAt = new \DateTime();
-    }
 
     public function getId(): int
     {
@@ -151,7 +147,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return null;
     }
 
-    public function eraseCredentials() {}
+    public function eraseCredentials()
+    {
+    }
 
     public function getPassword(): ?string
     {
