@@ -1,20 +1,16 @@
 <?php
 
-namespace App\Controller;
+namespace App\User\Controller;
 
-use App\Entity\User;
+use App\User\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\SerializerInterface;
 
 
 class UserController extends AbstractController
@@ -110,31 +106,5 @@ class UserController extends AbstractController
         $em->flush();
 
         return new JsonResponse(['message' => 'User deleted successfully'], Response::HTTP_NO_CONTENT);
-    }
-
-    #[Route('/api/login', name: 'api_user_login', methods: ['POST'])]
-    public function login(Request $request, EntityManagerInterface $em): Response
-    {
-        $data = json_decode($request->getContent(), true);
-
-        if (empty($data['email']) || empty($data['password'])) {
-            return new JsonResponse(['error' => 'Email and password required'], Response::HTTP_BAD_REQUEST);
-        }
-
-        $user = $em->getRepository(User::class)->findOneBy(['email' => $data['email']]);
-
-        if (!$user) {
-            return new JsonResponse(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
-        }
-
-        // TODO: add password hasher
-        // if (!$this->passwordEncoder->isPasswordValid($user, $data['password'])) {
-        if (password_verify($data['password'], $user->getPasswordHash()) === false) {
-            return new JsonResponse(['error' => 'Invalid credentials'], Response::HTTP_UNAUTHORIZED);
-        }
-
-        $token = $this->jwtManager->create($user);
-
-        return new JsonResponse(['token' => $token], Response::HTTP_OK);
     }
 }

@@ -6,7 +6,7 @@ security:
     providers:
         app_user_provider:
             entity:
-                class: App\Entity\User
+                class: App\User\Entity\User
                 property: email
     firewalls:
         dev:
@@ -27,7 +27,11 @@ security:
         login:
             pattern: ^/api/login
             stateless: true
-            security: false
+            json_login:
+                check_path: /api/login_check
+                username_path: email
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
 
 
         register:
@@ -45,7 +49,7 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        - { path: ^/api/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/login, roles: PUBLIC_ACCESS }
         - { path: ^/api/register, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         # Для остальных API - только авторизованные пользователи с ролью admin
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }

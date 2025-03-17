@@ -1,59 +1,65 @@
 <?php
 
-namespace App\Entity;
+namespace App\User\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
+//use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\SerializedName;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
 #[ORM\Table(name: "users")]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    private const READ = 'user:read';
+    private const WRITE = 'user:write';
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: "integer")]
-    #[Groups(['user:read'])]
+    #[ORM\Column(type: Types::INTEGER)]
+    #[Groups([self::READ])]
     private int $id;
 
-    #[ORM\Column(type: "string", length: 255)]
+    #[ORM\Column(type: Types::STRING, length: 255)]
     #[Assert\NotBlank]
-    #[Groups(['user:read', 'user:write'])]
+    #[Groups([self::READ, self::WRITE])]
     private string $name;
 
-    #[ORM\Column(type: "string", length: 20, unique: true)]
+    #[ORM\Column(type: Types::STRING, length: 20, unique: true)]
     #[Assert\NotBlank]
-    #[Groups(['user:read', 'user:write'])]
+    #[Groups([self::READ, self::WRITE])]
     private string $phone;
 
-    #[ORM\Column(type: "string", length: 255, unique: true)]
+    #[ORM\Column(type: Types::STRING, length: 255, unique: true)]
     #[Assert\NotBlank]
     #[Assert\Email]
-    #[Groups(['user:read', 'user:write'])]
+    #[Groups([self::READ, self::WRITE])]
     private string $email;
 
-    #[ORM\Column(type: "string", length: 255)]
+    #[ORM\Column(type: Types::STRING, length: 255)]
     #[Assert\NotBlank]
-    #[Groups(['user:write'])]
+    #[Groups([self::WRITE])]
     private string $passwordHash;
 
-    #[ORM\Column(type: "datetime", options: ["default" => "CURRENT_TIMESTAMP"])]
-    #[Groups(['user:read'])]
+    #[ORM\Column(type: "datetime")]
+//    #[Gedmo\Timestampable(on: "create")]
+    #[Groups([self::READ])]
     #[SerializedName('createdAt')]
     private \DateTime $createdAt;
 
-    #[ORM\Column(type: "datetime", options: ["default" => "CURRENT_TIMESTAMP", "onUpdate" => "CURRENT_TIMESTAMP"])]
-    #[Groups(['user:read'])]
+    #[ORM\Column(type: "datetime")]
+//    #[Gedmo\Timestampable(on: "update")]
+    #[Groups([self::READ])]
     #[SerializedName('updatedAt')]
     private \DateTime $updatedAt;
 
     public function __construct()
     {
-        $this->createdAt = new \DateTime();
-        $this->updatedAt = new \DateTime();
+      $this->createdAt = new \DateTime();
+      $this->updatedAt = new \DateTime();
     }
 
     public function getId(): int

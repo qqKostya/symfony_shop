@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Entity;
+namespace App\Order\Entity;
 
+use App\Order\Entity\Enum\DeliveryType;
+use App\Order\Entity\Enum\OrderStatus;
+use App\User\Entity\User;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
-use App\Enum\OrderStatus;
-use App\Enum\DeliveryType;
 
 #[ORM\Entity]
 #[ORM\Table(name: "orders")]
