@@ -2,100 +2,103 @@
 
 namespace App\User\Controller;
 
+use App\User\DTO\RegisterDTO;
+use App\User\DTO\UpdateDTO;
 use App\User\Entity\User;
+use App\User\Serializer\SerializationGroups;
 use Doctrine\ORM\EntityManagerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 
 
+#[Route('/api', name: 'api_')]
 class UserController extends AbstractController
 {
-    // private Serializer $serializer;
     private SerializerInterface $serializer;
     private JWTTokenManagerInterface $jwtManager;
 
     public function __construct(SerializerInterface $serializer, JWTTokenManagerInterface $jwtManager)
     {
-        // $this->serializer = new Serializer([new DateTimeNormalizer(), new ObjectNormalizer()], [new JsonEncoder()]);
         $this->serializer = $serializer;
         $this->jwtManager = $jwtManager;
     }
 
-    #[Route('/api/users', name: 'api_user_list', methods: ['GET'])]
-    public function list(EntityManagerInterface $em): Response
+    #[Route('/users', name: 'user_list', methods: [Request::METHOD_GET])]
+    public function list(EntityManagerInterface $em): JsonResponse
     {
         $users = $em->getRepository(User::class)->findBy([], ['id' => 'ASC']);
-        return new JsonResponse($this->serializer->normalize($users, null, ['groups' => 'user:read']), Response::HTTP_OK);
+        return new JsonResponse($this->serializer->normalize($users, 'json', ['groups' => SerializationGroups::USER_READ]), Response::HTTP_OK);
     }
 
-    #[Route('/api/users/{id}', name: 'api_user_get', methods: ['GET'])]
-    public function getUserById(int $id, EntityManagerInterface $em): Response
+    #[Route('/users/{id}', name: 'user_get', methods: [Request::METHOD_GET])]
+    public function getUserById(int $id, EntityManagerInterface $em): JsonResponse
     {
         $user = $em->getRepository(User::class)->find($id);
         if (!$user) {
             return new JsonResponse(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
         }
-        return new JsonResponse($this->serializer->normalize($user, null, ['groups' => 'user:read']), Response::HTTP_OK);
+        return new JsonResponse($this->serializer->normalize($user, 'json', ['groups' => SerializationGroups::USER_READ]), Response::HTTP_OK);
     }
 
-    #[Route('/api/register', name: 'api_user_create', methods: ['POST'])]
-    public function create(Request $request, EntityManagerInterface $em): Response
+    #[Route('/register', name: 'user_create', methods: [Request::METHOD_POST])]
+    public function create(
+        #[MapRequestPayload]
+        RegisterDTO $request, EntityManagerInterface $em
+    ): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
-        if (empty($data['name']) || empty($data['email']) || empty($data['phone']) || empty($data['password'])) {
-            return new JsonResponse(['error' => 'Missing required fields'], Response::HTTP_BAD_REQUEST);
-        }
-
         $user = new User();
-        $user->setName($data['name']);
-        $user->setPhone($data['phone']);
-        $user->setEmail($data['email']);
-        $user->setPasswordHash(password_hash($data['password'], PASSWORD_BCRYPT));
+        $user->setName($request->name);
+        $user->setPhone($request->phone);
+        $user->setEmail($request->email);
+        $user->setPasswordHash(password_hash($request->password, PASSWORD_BCRYPT));
 
         $em->persist($user);
         $em->flush();
 
-        return new JsonResponse($this->serializer->normalize($user, null, ['groups' => 'user:read']), Response::HTTP_CREATED);
+        return new JsonResponse($this->serializer->normalize($user, 'json', ['groups' => SerializationGroups::USER_READ]), Response::HTTP_CREATED);
     }
 
-    #[Route('/api/users/{id}', name: 'api_user_update', methods: ['PUT'])]
-    public function update(int $id, Request $request, EntityManagerInterface $em): Response
+    #[Route('/users/{id}', name: 'user_update', methods: [Request::METHOD_PUT])]
+    public function update(
+        int $id,
+        #[MapRequestPayload]
+        UpdateDTO $request,
+        EntityManagerInterface $em): JsonResponse
     {
         $user = $em->getRepository(User::class)->find($id);
         if (!$user) {
             return new JsonResponse(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
         }
 
-        $data = json_decode($request->getContent(), true);
-
-        if (!empty($data['name'])) {
-            $user->setName($data['name']);
+        if ($request->name !== null && $request->name !== $user->getName()) {
+            $user->setName($request->name);
         }
-        if (!empty($data['phone'])) {
-            $user->setPhone($data['phone']);
+        if ($request->phone !== null && $request->phone !== $user->getPhone()) {
+            $user->setPhone($request->phone);
         }
-        if (!empty($data['email'])) {
-            $user->setEmail($data['email']);
+        if ($request->email !== null && $request->email !== $user->getEmail()) {
+            $user->setEmail($request->email);
         }
-        if (!empty($data['password'])) {
-            $user->setPasswordHash(password_hash($data['password'], PASSWORD_BCRYPT));
+        if ($request->password !== null && $request->password !== $user->getPasswordHash()) {
+            $user->setPasswordHash(password_hash($request->password, PASSWORD_BCRYPT));
         }
 
         $user->setUpdatedAt(new \DateTime());
 
         $em->flush();
 
-        return new JsonResponse($this->serializer->normalize($user, null, ['groups' => 'user:read']), Response::HTTP_OK);
+        return new JsonResponse($this->serializer->normalize($user, 'json', ['groups' => SerializationGroups::USER_READ]), Response::HTTP_OK);
     }
 
 
-    #[Route('/api/users/{id}', name: 'api_user_delete', methods: ['DELETE'])]
-    public function delete(int $id, EntityManagerInterface $em): Response
+    #[Route('/users/{id}', name: 'user_delete', methods: [Request::METHOD_DELETE])]
+    public function delete(int $id, EntityManagerInterface $em): JsonResponse
     {
         $user = $em->getRepository(User::class)->find($id);
         if (!$user) {

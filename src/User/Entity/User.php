@@ -2,6 +2,7 @@
 
 namespace App\User\Entity;
 
+use App\User\Serializer\SerializationGroups;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -12,48 +13,53 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity]
+//#[ORM\Table(name: "users", schema: 'users')]
 #[ORM\Table(name: "users")]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    private const READ = 'user:read';
-    private const WRITE = 'user:write';
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]
-    #[Groups([self::READ])]
+    #[Groups([SerializationGroups::USER_READ])]
     private int $id;
 
     #[ORM\Column(type: Types::STRING, length: 255)]
     #[Assert\NotBlank]
-    #[Groups([self::READ, self::WRITE])]
+    #[Groups([SerializationGroups::USER_READ, SerializationGroups::USER_WRITE])]
     private string $name;
 
     #[ORM\Column(type: Types::STRING, length: 20, unique: true)]
     #[Assert\NotBlank]
-    #[Groups([self::READ, self::WRITE])]
+    #[Groups([SerializationGroups::USER_READ, SerializationGroups::USER_WRITE])]
     private string $phone;
 
     #[ORM\Column(type: Types::STRING, length: 255, unique: true)]
     #[Assert\NotBlank]
     #[Assert\Email]
-    #[Groups([self::READ, self::WRITE])]
+    #[Groups([SerializationGroups::USER_READ, SerializationGroups::USER_WRITE])]
     private string $email;
 
+    //TODO: Length скорей всего не актуален так как мы храним хэш
     #[ORM\Column(type: Types::STRING, length: 255)]
     #[Assert\NotBlank]
-    #[Groups([self::WRITE])]
+    #[Assert\Length(
+        min: 2,
+        max: 50,
+        minMessage: 'Пароль должен быть не менее {{ limit }} символов',
+        maxMessage: 'Пароль должен быть не более {{ limit }} символов',
+    )]
+    #[Groups([SerializationGroups::USER_WRITE])]
     private string $passwordHash;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Gedmo\Timestampable(on: "create")]
-    #[Groups([self::READ])]
+    #[Groups([SerializationGroups::USER_READ])]
     #[SerializedName('createdAt')]
     private \DateTime $createdAt;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Gedmo\Timestampable(on: "update")]
-    #[Groups([self::READ])]
+    #[Groups([SerializationGroups::USER_READ])]
     #[SerializedName('updatedAt')]
     private \DateTime $updatedAt;
 
@@ -103,9 +109,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setPasswordHash(string $passwordHash): self
     {
-        if (strlen($passwordHash) < 8) {
-            throw new \InvalidArgumentException("Пароль должен быть не менее 8 символов");
-        }
         $this->passwordHash = $passwordHash;
         return $this;
     }
