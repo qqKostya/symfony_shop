@@ -1,9 +1,9 @@
 <?php
 
-namespace App\User\DTO;
+namespace App\User\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final readonly class UpdateDTO
+final readonly class RequestUpdate
 {
     #[Assert\Length(min: 2, max: 255, minMessage: "Имя должно содержать минимум {{ limit }} символа")]
     public ?string $name;
