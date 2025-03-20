@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Cart\DTO;
+namespace App\Cart\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final readonly class AddItemDTO
+final readonly class RequestItem
 {
     #[Assert\NotBlank(message: "ID товара обязательнл")]
     public int $productId;

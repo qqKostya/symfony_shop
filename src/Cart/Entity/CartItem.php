@@ -2,11 +2,14 @@
 
 namespace App\Cart\Entity;
 
+use App\Cart\Serializer\SerializationGroups;
 use App\Product\Entity\Product;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Validator\Constraints as Assert;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity]
 #[ORM\Table(name: "cart_items", schema: 'carts')]
@@ -21,12 +24,14 @@ class CartItem
     #[ORM\JoinColumn(name: "cart_id", referencedColumnName: "id", onDelete: "CASCADE")]
     private Cart $cart;
 
-    #[ORM\ManyToOne(targetEntity: Product::class)]
+    #[ORM\ManyToOne(targetEntity: Product::class, fetch: "EAGER")]
     #[ORM\JoinColumn(name: "product_id", referencedColumnName: "id", onDelete: "CASCADE")]
-    private int $productId;
+    #[Groups([SerializationGroups::CART_ITEMS_READ])]
+    private Product $product;
 
     #[ORM\Column(type: Types::INTEGER)]
     #[Assert\Positive]
+    #[Groups([SerializationGroups::CART_ITEMS_READ])]
     private int $quantity;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
@@ -54,14 +59,14 @@ class CartItem
         $this->cart = $cart;
     }
 
-    public function getProductId(): int
+    public function getProduct(): Product
     {
-        return $this->productId;
+        return $this->product;
     }
 
-    public function setProductId(int $productId): void
+    public function setProduct(Product $product): void
     {
-        $this->productId = $productId;
+        $this->product = $product;
     }
 
     public function getQuantity(): int

@@ -3,100 +3,98 @@
 namespace App\Cart\Controller;
 
 use App\Cart\DTO\AddItemDTO;
+use App\Cart\Request\RequestItem;
+use App\Cart\Serializer\SerializationGroups;
+use App\Cart\Service\CartService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Cart\Entity\Cart;
-use App\Cart\Entity\CartItem;
 use App\User\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\SerializerInterface;
+
 
 #[Route('/api', name: 'api_')]
+#[IsGranted('ROLE_USER')]
 class CartController extends AbstractController
 {
-    #[Route('/cart', name: 'cart_get', methods: [Request::METHOD_GET])]
-    public function getCart(EntityManagerInterface $em): JsonResponse
+    private CartService $cartService;
+    private SerializerInterface $serializer;
+    private Security $security;
+    public function __construct(CartService $cartService, SerializerInterface $serializer, Security $security)
     {
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-            return new JsonResponse(['error' => 'Требуеться авторизация'], Response::HTTP_UNAUTHORIZED);
-        }
+        $this->cartService = $cartService;
+        $this->serializer = $serializer;
+        $this->security = $security;
+    }
+    #[Route('/cart', name: 'cart_get', methods: [Request::METHOD_GET])]
+    public function getCart(): JsonResponse
+    {
+        $user = $this->security->getUser();
+        $cart = $this->cartService->getCartByUser($user);
 
-        $cart = $em->getRepository(Cart::class)->findOneBy(['user' => $user]);
         if (!$cart) {
             return new JsonResponse(['error' => 'Корзина не найдена'], Response::HTTP_NOT_FOUND);
         }
 
-        return new JsonResponse([
+        $cartInfo = [
             'cart_id' => $cart->getId(),
-            'items' => $cart->getItems($em),
-        ], Response::HTTP_OK);
+            'items' => $this->cartService->getItemsFromCart($cart),
+        ];
+
+
+        return new JsonResponse($this->serializer->normalize($cartInfo, 'json', ['groups' => SerializationGroups::CART_ITEMS_READ]), Response::HTTP_OK);
     }
+
 
     #[Route('/cart/add', name: 'cart_add_item', methods: [Request::METHOD_POST])]
     public function addItem(
         #[MapRequestPayload]
-        AddItemDTO $request,
-        EntityManagerInterface $em
+         RequestItem $request
     ): JsonResponse
     {
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-            return new JsonResponse(['error' => 'Требуеться авторизация'], Response::HTTP_UNAUTHORIZED);
-        }
+        $user = $this->security->getUser();
+        $this->cartService->addItemToCart($user, $request);
 
+        $cart = $this->cartService->getCartByUser($user);
+        $cartItems = $this->cartService->getItemsFromCart($cart);
 
-        $cart = $em->getRepository(Cart::class)->findOneBy(['user' => $user]) ?? new Cart($user);
-        $cart->addItem($em, $cart, $request->productId, $request->quantity);
+        return new JsonResponse($this->serializer->normalize([
+            'cart' => $cart,
+            'items' => $cartItems
+        ], 'json', ['groups' => SerializationGroups::CART_ITEMS_READ]), Response::HTTP_OK);
 
-        $em->persist($cart);
-        $em->flush();
-
-        return new JsonResponse(['message' => 'Товар добавлен в корзину'], Response::HTTP_CREATED);
     }
 
-    #[Route('/cart/remove/{productId}', name: 'cart_remove_item', methods: [Request::METHOD_DELETE])]
+    #[Route('/cart/remove', name: 'cart_remove_item', methods: [Request::METHOD_POST])]
     public function removeItem(
         #[MapRequestPayload]
-        AddItemDTO $request,
-        EntityManagerInterface $em
+        RequestItem $request,
     ): JsonResponse
     {
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-            return new JsonResponse(['error' => 'Требуеться авторизация'], Response::HTTP_UNAUTHORIZED);
-        }
+        $user = $this->security->getUser();
+        $this->cartService->removeItemFromCart($user, $request);
 
-        $cart = $em->getRepository(Cart::class)->findOneBy(['user' => $user]);
-        if (!$cart) {
-            return new JsonResponse(['error' => 'Корзина не найдена'], Response::HTTP_NOT_FOUND);
-        }
+        $cart = $this->cartService->getCartByUser($user);
+        $cartItems = $this->cartService->getItemsFromCart($cart);
 
-        $cart->removeItem($em, $cart, $request->productId, $request->quantity);
+        return new JsonResponse($this->serializer->normalize([
+            'cart' => $cart,
+            'items' => $cartItems
+        ], 'json', ['groups' => SerializationGroups::CART_ITEMS_READ]), Response::HTTP_OK);
 
-        return new JsonResponse(['error' => "Товар удален в количестве {$request->quantity}"], Response::HTTP_OK);
     }
 
     #[Route('/cart/clear', name: 'cart_clear', methods: [Request::METHOD_DELETE])]
-    public function clearCart(EntityManagerInterface $em): JsonResponse
+    public function clearCart(): JsonResponse
     {
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-            return new JsonResponse(['error' => 'Требуеться авторизация'], Response::HTTP_UNAUTHORIZED);
-        }
-
-        // Найти корзину пользователя
-        $cart = $em->getRepository(Cart::class)->findOneBy(['user' => $user]);
-        if (!$cart) {
-            return new JsonResponse(['error' => 'Корзина не найдена'], Response::HTTP_NOT_FOUND);
-        }
-
-        $em->remove($cart);
-
-        $em->flush();
+        $user = $this->security->getUser();
+        $this->cartService->deleteCart($user);
 
         return new JsonResponse(['message' => 'Корзина и все товары в ней удалены'], Response::HTTP_OK);
     }

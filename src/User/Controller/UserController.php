@@ -4,11 +4,8 @@ namespace App\User\Controller;
 
 use App\User\Request\RequestRegister;
 use App\User\Request\RequestUpdate;
-use App\User\Entity\User;
 use App\User\Serializer\SerializationGroups;
 use App\User\Service\UserService;
-use Doctrine\ORM\EntityManagerInterface;
-use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,14 +19,12 @@ use Symfony\Component\Serializer\SerializerInterface;
 class UserController extends AbstractController
 {
     private SerializerInterface $serializer;
-    private JWTTokenManagerInterface $jwtManager;
     private UserService $userService;
 
-    public function __construct(UserService $userService, SerializerInterface $serializer, JWTTokenManagerInterface $jwtManager)
+    public function __construct(UserService $userService, SerializerInterface $serializer)
     {
         $this->userService = $userService;
         $this->serializer = $serializer;
-        $this->jwtManager = $jwtManager;
     }
 
 
@@ -77,7 +72,7 @@ class UserController extends AbstractController
 
 
     #[Route('/users/{id}', name: 'user_delete', methods: [Request::METHOD_DELETE])]
-    public function delete(int $id, EntityManagerInterface $em): JsonResponse
+    public function delete(int $id): JsonResponse
     {
         $deleted = $this->userService->deleteUser($id);
 

@@ -142,7 +142,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRoles(): array
     {
-        return ['admin'];
+        //TODO: add role admin
+        return ['ROLE_USER'];
     }
 
     public function getSalt(): ?string
