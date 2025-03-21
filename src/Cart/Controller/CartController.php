@@ -7,9 +7,6 @@ use App\Cart\Request\RequestItem;
 use App\Cart\Serializer\SerializationGroups;
 use App\Cart\Service\CartService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use App\Cart\Entity\Cart;
-use App\User\Entity\User;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,7 +17,6 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 
 #[Route('/api', name: 'api_')]
-#[IsGranted('ROLE_USER')]
 class CartController extends AbstractController
 {
     private CartService $cartService;

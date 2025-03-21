@@ -5,38 +5,70 @@ namespace App\Order\Entity;
 use App\Order\Entity\Enum\DeliveryType;
 use App\Order\Entity\Enum\OrderStatus;
 use App\User\Entity\User;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Validator\Constraints as Assert;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity]
-#[ORM\Table(name: "orders")]
+#[ORM\Table(name: "orders", schema: 'orders')]
 class Order
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: "integer")]
+    #[ORM\Column(type: Types::INTEGER)]
     private int $id;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: "user_id", referencedColumnName: "id", onDelete: "CASCADE")]
     private User $user;
 
-    #[ORM\Column(type: "string")]
+    #[ORM\Column(type: Types::STRING)]
     #[Assert\Choice(callback: [OrderStatus::class, 'cases'])]
     private string $status;
 
-    #[ORM\Column(type: "string")]
+    #[ORM\Column(type: Types::STRING)]
     #[Assert\Choice(callback: [DeliveryType::class, 'cases'])]
     private string $deliveryType;
 
-    #[ORM\Column(type: "json")]
+    #[ORM\Column(type: Types::JSON)]
     private array $deliveryAddress;
 
-    #[ORM\Column(type: "datetime", options: ["default" => "CURRENT_TIMESTAMP"])]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Gedmo\Timestampable(on: "create")]
+    #[SerializedName('createdAt')]
     private \DateTime $createdAt;
 
-    #[ORM\Column(type: "datetime", options: ["default" => "CURRENT_TIMESTAMP", "onUpdate" => "CURRENT_TIMESTAMP"])]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Gedmo\Timestampable(on: "update")]
+    #[SerializedName('updatedAt')]
     private \DateTime $updatedAt;
+
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    public function getUser(): User
+    {
+        return $this->user;
+    }
+
+    public function setUser(User $user): void
+    {
+        $this->user = $user;
+    }
+
+    public function getDeliveryAddress(): array
+    {
+        return $this->deliveryAddress;
+    }
+
+    public function setDeliveryAddress(array $deliveryAddress): void
+    {
+        $this->deliveryAddress = $deliveryAddress;
+    }
 
     public function setStatus(OrderStatus $status): self
     {

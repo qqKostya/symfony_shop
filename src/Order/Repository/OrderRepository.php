@@ -1,31 +1,31 @@
 <?php
 
-namespace App\Cart\Repository;
+namespace App\Order\Repository;
 
-use App\Cart\Entity\Cart;
+use App\Order\Entity\Order;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
-class CartRepository extends ServiceEntityRepository
+class OrderRepository extends ServiceEntityRepository
 {
     private EntityManagerInterface $entityManager;
 
     public function __construct(ManagerRegistry $registry, EntityManagerInterface $entityManager)
     {
-        parent::__construct($registry, Cart::class);
+        parent::__construct($registry, Order::class);
         $this->entityManager = $entityManager;
     }
 
-    public function save(Cart $cart): void
+    public function save(Order $order): void
     {
-        $this->entityManager->persist($cart);
+        $this->entityManager->persist($order);
         $this->entityManager->flush();
     }
 
-    public function delete(Cart $cart): void
+    public function delete(Order $order): void
     {
-        $this->entityManager->remove($cart);
+        $this->entityManager->remove($order);
         $this->entityManager->flush();
     }
 }
