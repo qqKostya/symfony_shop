@@ -60,7 +60,6 @@ class OrderController extends AbstractController
         RequestStatus $request
     ): JsonResponse
     {
-        $user = $this->security->getUser();
         $order = $this->orderService->changeStatus($request->orderId, $request->status);
 
         return new JsonResponse($this->serializer->normalize($order, 'json'), Response::HTTP_OK);

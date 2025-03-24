@@ -2,12 +2,15 @@
 
 namespace App\Order\Service;
 
+use App\Order\Entity\Enum\DeliveryType;
 use App\Order\Entity\Order;
 use App\Order\Entity\OrderItem;
 use App\Order\Repository\OrderRepository;
 use App\Order\Request\RequestCreateOrder;
+use App\Product\Entity\Product;
 use App\User\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Order\Entity\Enum\OrderStatus;
 
 class OrderService
 {
@@ -34,16 +37,17 @@ class OrderService
     {
         $order = new Order();
         $order->setUser($user);
-        $order->setStatus($request->status);
+        $order->setStatus(OrderStatus::from($request->status));
         $order->setDeliveryAddress($request->deliveryAddress);
-        $order->setDeliveryType($request->deliveryType);
+        $order->setDeliveryType(DeliveryType::from($request->deliveryType));
         $this->orderRepository->save($order);
 
-        foreach ($request->items->all() as $item) {
+        foreach ($request->items as $item) {
             $orderItem = new OrderItem();
             $orderItem->setOrder($order);
-            $orderItem->setProduct($item->product);
-            $orderItem->setQuantity($item->quantity);
+            $product = $this->entityManager->getRepository(Product::class)->find($item['productId']);
+            $orderItem->setProduct($product);
+            $orderItem->setQuantity($item['quantity']);
             $this->entityManager->persist($orderItem);
             $this->entityManager->flush();
         }

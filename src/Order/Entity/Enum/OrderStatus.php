@@ -10,4 +10,16 @@ enum OrderStatus: string
     case DELIVERING = 'доставляется';
     case RECEIVED = 'получен';
     case CANCELED = 'отменён';
+
+    public static function getValues(): array
+    {
+        return [
+            self::PAID->value,
+            self::ASSEMBLING->value,
+            self::READY->value,
+            self::DELIVERING->value,
+            self::RECEIVED->value,
+            self::CANCELED->value,
+        ];
+    }
 }
