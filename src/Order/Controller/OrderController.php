@@ -3,6 +3,7 @@
 namespace App\Order\Controller;
 
 use App\Order\Request\RequestCreateOrder;
+use App\Order\Request\RequestStatus;
 use App\Order\Service\OrderService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -25,20 +26,20 @@ class OrderController extends AbstractController
         $this->security = $security;
         $this->orderService = $orderService;
     }
-    #[Route('/orders', name: 'cart_get', methods: [Request::METHOD_GET])]
+    #[Route('/orders', name: 'order_list', methods: [Request::METHOD_GET])]
     public function getOrders(): JsonResponse
     {
         $user = $this->security->getUser();
         $orders = $this->orderService->getOrdersByUser($user);
         return new JsonResponse($this->serializer->normalize($orders, 'json'), Response::HTTP_OK);
     }
-    #[Route('/orders/{id}', name: 'cart_get', methods: [Request::METHOD_GET])]
+    #[Route('/orders/{id}', name: 'order_get', methods: [Request::METHOD_GET])]
     public function getOrder(int $id): JsonResponse
     {
         $orders = $this->orderService->getOrdersById($id);
         return new JsonResponse($this->serializer->normalize($orders, 'json'), Response::HTTP_OK);
     }
-    #[Route('/orders', name: 'cart_get', methods: [Request::METHOD_POST])]
+    #[Route('/orders', name: 'order_create', methods: [Request::METHOD_POST])]
     public function createOrder(
         #[MapRequestPayload]
         RequestCreateOrder $request
@@ -51,5 +52,17 @@ class OrderController extends AbstractController
             'cart' => $order,
             'items' => $orderItems
         ], 'json'), Response::HTTP_OK);
+    }
+
+    #[Route('/orders/{id}/status', name: 'order_update_status', methods: [Request::METHOD_PATCH])]
+    public function updateOrderStatus(
+        #[MapRequestPayload]
+        RequestStatus $request
+    ): JsonResponse
+    {
+        $user = $this->security->getUser();
+        $order = $this->orderService->changeStatus($request->orderId, $request->status);
+
+        return new JsonResponse($this->serializer->normalize($order, 'json'), Response::HTTP_OK);
     }
 }

@@ -55,4 +55,12 @@ class OrderService
     {
         return $this->entityManager->getRepository(OrderItem::class)->findBy(['order' =>$order]);
     }
+
+    public function changeStatus(int $orderId, string $status): Order
+    {
+        $order = $this->orderRepository->findOneBy(['id' => $orderId]);
+        $order->setStatus($status);
+        $this->orderRepository->save($order);
+        return $order;
+    }
 }

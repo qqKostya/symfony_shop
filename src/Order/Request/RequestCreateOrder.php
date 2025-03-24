@@ -21,20 +21,23 @@ final readonly class RequestCreateOrder
     public string $deliveryType;
 
     #[Assert\NotBlank(message: "Адрес доставки обязателен")]
-    #[Assert\Type(type: 'json', message: "Адрес доставки должен быть json")]
-    public array $deliveryAddress;
+    #[Assert\Valid]
+    public RequestDeliveryAddress $deliveryAddress;
 
+    // #[Assert\NotBlank(message: "Товары в заказе обязательны")]
+    // #[Assert\Valid]
+    // public RequestCreateOrderItemsCollection $items;
     #[Assert\NotBlank(message: "Товары в заказе обязательны")]
     #[Assert\Valid]
-    public RequestCreateOrderItemsCollection $items;
+    public array $items;
 
 
     public function __construct(
         int $userId,
         string $status,
         string $deliveryType,
-        array $deliveryAddress,
-        RequestCreateOrderItemsCollection $items
+        RequestDeliveryAddress $deliveryAddress,
+        array $items
     ) {
         $this->userId = $userId;
         $this->status = $status;
