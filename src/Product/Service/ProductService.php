@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Product\Service;
 
 use App\Product\Entity\Product;
@@ -7,7 +9,7 @@ use App\Product\Repository\ProductRepository;
 use App\Product\Request\RequestCreateProduct;
 use App\Product\Request\RequestUpdateProduct;
 
-class ProductService
+final class ProductService
 {
     private ProductRepository $productRepository;
 
@@ -39,6 +41,7 @@ class ProductService
         $product->setLength($request->length);
 
         $this->productRepository->save($product);
+
         return $product;
     }
 

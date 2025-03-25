@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Order\Entity\Enum;
 
 enum OrderStatus: string
 {
-    case PAID = 'оплачен';
+    case PAID       = 'оплачен';
     case ASSEMBLING = 'в сборке';
-    case READY = 'готов к выдаче';
+    case READY      = 'готов к выдаче';
     case DELIVERING = 'доставляется';
-    case RECEIVED = 'получен';
-    case CANCELED = 'отменён';
+    case RECEIVED   = 'получен';
+    case CANCELED   = 'отменён';
 
     public static function getValues(): array
     {

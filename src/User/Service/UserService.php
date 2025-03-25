@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\User\Service;
 
 use App\User\Entity\User;
@@ -8,9 +10,10 @@ use App\User\Request\RequestRegister;
 use App\User\Request\RequestUpdate;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class UserService
+final class UserService
 {
     private UserRepository $userRepository;
+
     private UserPasswordHasherInterface $passwordHasher;
 
     public function __construct(UserRepository $userRepository, UserPasswordHasherInterface $passwordHasher)
@@ -36,8 +39,8 @@ class UserService
         $user->setPhone($request->phone);
         $user->setEmail($request->email);
         $user->setPasswordHash($this->passwordHasher->hashPassword($user, $request->password));
-        $user->setCreatedAt(new \DateTime());
-        $user->setUpdatedAt(new \DateTime());
+        $user->setCreatedAt(new \DateTimeImmutable());
+        $user->setUpdatedAt(new \DateTimeImmutable());
 
         $this->userRepository->save($user);
 

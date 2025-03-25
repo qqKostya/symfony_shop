@@ -1,18 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Product\Entity;
 
+use App\Cart\Serializer\SerializationGroups as SerializationGroupsCart;
 use App\Product\Serializer\SerializationGroups;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Validator\Constraints as Assert;
-use Gedmo\Mapping\Annotation as Gedmo;
-use App\Cart\Serializer\SerializationGroups as SerializationGroupsCart;
 
 #[ORM\Entity]
-#[ORM\Table(name: "products")]
+#[ORM\Table(name: 'products')]
 class Product
 {
     #[ORM\Id]
@@ -61,21 +63,22 @@ class Product
     private ?int $length;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Gedmo\Timestampable(on: "create")]
+    #[Gedmo\Timestampable(on: 'create')]
     #[SerializedName('createdAt')]
     #[Groups([SerializationGroups::PRODUCT_READ])]
-    private \DateTime $createdAt;
+    private \DateTimeImmutable $createdAt;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Gedmo\Timestampable(on: "update")]
+    #[Gedmo\Timestampable(on: 'update')]
     #[SerializedName('updatedAt')]
     #[Groups([SerializationGroups::PRODUCT_READ])]
-    private \DateTime $updatedAt;
+    private \DateTimeImmutable $updatedAt;
 
     public function getId(): int
     {
         return $this->id;
     }
+
     public function getName(): string
     {
         return $this->name;

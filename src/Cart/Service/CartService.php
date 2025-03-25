@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Cart\Service;
 
 use App\Cart\Entity\Cart;
@@ -10,15 +12,16 @@ use App\Product\Entity\Product;
 use App\User\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 
-class CartService
+final class CartService
 {
     private CartRepository $cartRepository;
+
     private EntityManagerInterface $entityManager;
 
     public function __construct(CartRepository $cartRepository, EntityManagerInterface $entityManager)
     {
         $this->cartRepository = $cartRepository;
-        $this->entityManager = $entityManager;
+        $this->entityManager  = $entityManager;
     }
 
     public function getCartByUser(?User $user): ?Cart
@@ -28,7 +31,7 @@ class CartService
 
     public function addItemToCart(User $user, RequestItem $request): void
     {
-        $cart = $this->getCartByUser($user);
+        $cart    = $this->getCartByUser($user);
         $product = $this->entityManager->getRepository(Product::class)->find($request->productId);
 
         if (!$cart) {
@@ -58,8 +61,8 @@ class CartService
      */
     public function removeItemFromCart(User $user, RequestItem $request): void
     {
-        $cart = $this->getCartByUser($user);
-        $product = $this->entityManager->getRepository(Product::class)->find($request->productId);
+        $cart         = $this->getCartByUser($user);
+        $product      = $this->entityManager->getRepository(Product::class)->find($request->productId);
         $existingItem = $this->entityManager->getRepository(CartItem::class)->findOneBy(['cart' => $cart, 'product' => $product]);
 
         if ($existingItem) {

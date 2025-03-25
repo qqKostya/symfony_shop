@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Order\Repository;
 
 use App\Order\Entity\Order;
@@ -7,7 +9,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
-class OrderRepository extends ServiceEntityRepository
+final class OrderRepository extends ServiceEntityRepository
 {
     private EntityManagerInterface $entityManager;
 

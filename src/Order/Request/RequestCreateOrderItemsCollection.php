@@ -1,16 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Order\Request;
 
 use Symfony\Component\Validator\Constraints as Assert;
-use ArrayIterator;
-use IteratorAggregate;
-use InvalidArgumentException;
 
-final class RequestCreateOrderItemsCollection implements IteratorAggregate
+final class RequestCreateOrderItemsCollection implements \IteratorAggregate
 {
     /** @var RequestCreateOrderItems[] */
-    #[Assert\NotBlank(message: "Товары в заказе обязательны")]
+    #[Assert\NotBlank(message: 'Товары в заказе обязательны')]
     #[Assert\Valid]
     private array $items = [];
 
@@ -18,15 +17,15 @@ final class RequestCreateOrderItemsCollection implements IteratorAggregate
     {
         foreach ($items as $item) {
             if (!$item instanceof RequestCreateOrderItems) {
-                throw new InvalidArgumentException('Элемент должен быть объектом RequestCreateOrderItems.');
+                throw new \InvalidArgumentException('Элемент должен быть объектом RequestCreateOrderItems.');
             }
         }
         $this->items = $items;
     }
 
-    public function getIterator(): ArrayIterator
+    public function getIterator(): \ArrayIterator
     {
-        return new ArrayIterator($this->items);
+        return new \ArrayIterator($this->items);
     }
 
     public function first(): ?RequestCreateOrderItems

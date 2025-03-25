@@ -1,29 +1,35 @@
 <?php
 
+declare(strict_types=1);
+
 // src/Report/Service/ReportService.php
+
 namespace App\Report\Service;
 
-use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Filesystem\Filesystem;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Serializer\SerializerInterface;
 
-class ReportService
+final class ReportService
 {
     private KafkaProducer $kafkaProducer;
+
     private EntityManagerInterface $entityManager;
+
     private Filesystem $filesystem;
+
     private SerializerInterface $serializer;
 
     public function __construct(
         KafkaProducer $kafkaProducer,
         EntityManagerInterface $entityManager,
         Filesystem $filesystem,
-        SerializerInterface $serializer
+        SerializerInterface $serializer,
     ) {
         $this->kafkaProducer = $kafkaProducer;
         $this->entityManager = $entityManager;
-        $this->filesystem = $filesystem;
-        $this->serializer = $serializer;
+        $this->filesystem    = $filesystem;
+        $this->serializer    = $serializer;
     }
 
     public function startReportGeneration(): string
@@ -42,7 +48,7 @@ class ReportService
         $soldItems = $this->getSoldItems();
 
         $filePath = '/path/to/reports/' . $reportId . '.jsonl';
-        $file = fopen($filePath, 'w');
+        $file     = fopen($filePath, 'w');
 
         foreach ($soldItems as $item) {
             $jsonLine = json_encode($item) . "\n";
@@ -56,8 +62,8 @@ class ReportService
     {
         // Пример получения проданных товаров (можно заменить на реальные данные из БД)
         return [
-            ["product_name" => "велосипед_10", "price" => 500, "amount" => 1, "user" => ["id" => 1]],
-            ["product_name" => "велосипед_10", "price" => 500, "amount" => 1, "user" => ["id" => 2]],
+            ['product_name' => 'велосипед_10', 'price' => 500, 'amount' => 1, 'user' => ['id' => 1]],
+            ['product_name' => 'велосипед_10', 'price' => 500, 'amount' => 1, 'user' => ['id' => 2]],
         ];
     }
 

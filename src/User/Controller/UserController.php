@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\User\Controller;
 
 use App\User\Request\RequestRegister;
@@ -14,21 +16,19 @@ use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 
-
 #[Route('/api')]
-class UserController extends AbstractController
+final class UserController extends AbstractController
 {
     public function __construct(
         private SerializerInterface $serializer,
-        private UserService         $userService)
-    {
-    }
+        private UserService $userService,
+    ) {}
 
-
-    #[Route('/users',  methods: [Request::METHOD_GET])]
+    #[Route('/users', methods: [Request::METHOD_GET])]
     public function list(): JsonResponse
     {
         $users = $this->userService->getAllUsers();
+
         return new JsonResponse($this->serializer->normalize($users, 'json', ['groups' => SerializationGroups::USER_READ]), Response::HTTP_OK);
     }
 
@@ -39,25 +39,26 @@ class UserController extends AbstractController
         if (!$user) {
             return new JsonResponse(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
         }
+
         return new JsonResponse($this->serializer->normalize($user, 'json', ['groups' => SerializationGroups::USER_READ]), Response::HTTP_OK);
     }
 
     #[Route('/register', methods: [Request::METHOD_POST])]
     public function create(
         #[MapRequestPayload]
-        RequestRegister $request
-    ): JsonResponse
-    {
+        RequestRegister $request,
+    ): JsonResponse {
         $user = $this->userService->createUser($request);
+
         return $this->json($user, Response::HTTP_CREATED, [], ['groups' => SerializationGroups::USER_READ]);
     }
 
     #[Route('/users/{id}', methods: [Request::METHOD_PUT])]
     public function update(
-        int           $id,
+        int $id,
         #[MapRequestPayload]
-        RequestUpdate $request): JsonResponse
-    {
+        RequestUpdate $request,
+    ): JsonResponse {
         $user = $this->userService->updateUser($id, $request);
 
         if (!$user) {
@@ -66,7 +67,6 @@ class UserController extends AbstractController
 
         return new JsonResponse($this->serializer->normalize($user, 'json', ['groups' => SerializationGroups::USER_READ]), Response::HTTP_OK);
     }
-
 
     #[Route('/users/{id}', methods: [Request::METHOD_DELETE])]
     public function delete(int $id): JsonResponse

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Cart\Repository;
 
 use App\Cart\Entity\Cart;
@@ -7,7 +9,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
-class CartRepository extends ServiceEntityRepository
+final class CartRepository extends ServiceEntityRepository
 {
     private EntityManagerInterface $entityManager;
 

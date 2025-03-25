@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Product\Repository;
 
 use App\Product\Entity\Product;
@@ -7,7 +9,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
-class ProductRepository extends ServiceEntityRepository
+final class ProductRepository extends ServiceEntityRepository
 {
     private EntityManagerInterface $entityManager;
 

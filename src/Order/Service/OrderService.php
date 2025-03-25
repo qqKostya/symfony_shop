@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Order\Service;
 
 use App\Order\Entity\Enum\DeliveryType;
+use App\Order\Entity\Enum\OrderStatus;
 use App\Order\Entity\Order;
 use App\Order\Entity\OrderItem;
 use App\Order\Repository\OrderRepository;
@@ -10,17 +13,17 @@ use App\Order\Request\RequestCreateOrder;
 use App\Product\Entity\Product;
 use App\User\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Order\Entity\Enum\OrderStatus;
 
-class OrderService
+final class OrderService
 {
     private OrderRepository $orderRepository;
+
     private EntityManagerInterface $entityManager;
 
     public function __construct(OrderRepository $orderRepository, EntityManagerInterface $entityManager)
     {
         $this->orderRepository = $orderRepository;
-        $this->entityManager = $entityManager;
+        $this->entityManager   = $entityManager;
     }
 
     public function getOrdersByUser(?User $user): array
@@ -33,7 +36,7 @@ class OrderService
         return $this->orderRepository->findOneBy(['id' => $id]);
     }
 
-    public function orderCreate(User $user,RequestCreateOrder $request): ?Order
+    public function orderCreate(User $user, RequestCreateOrder $request): ?Order
     {
         $order = new Order();
         $order->setUser($user);
@@ -57,7 +60,7 @@ class OrderService
 
     public function getItemsFromOrder(Order $order): array
     {
-        return $this->entityManager->getRepository(OrderItem::class)->findBy(['order' =>$order]);
+        return $this->entityManager->getRepository(OrderItem::class)->findBy(['order' => $order]);
     }
 
     public function changeStatus(int $orderId, string $status): Order
@@ -65,6 +68,7 @@ class OrderService
         $order = $this->orderRepository->findOneBy(['id' => $orderId]);
         $order->setStatus($status);
         $this->orderRepository->save($order);
+
         return $order;
     }
 }

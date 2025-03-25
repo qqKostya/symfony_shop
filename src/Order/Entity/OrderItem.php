@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Order\Entity;
 
 use App\Product\Entity\Product;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Validator\Constraints as Assert;
-use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity]
-#[ORM\Table(name: "order_items", schema: 'orders')]
+#[ORM\Table(name: 'order_items', schema: 'orders')]
 class OrderItem
 {
     #[ORM\Id]
@@ -19,11 +21,11 @@ class OrderItem
     private int $id;
 
     #[ORM\ManyToOne(targetEntity: Order::class)]
-    #[ORM\JoinColumn(name: "order_id", referencedColumnName: "id", onDelete: "CASCADE")]
+    #[ORM\JoinColumn(name: 'order_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     private Order $order;
 
-    #[ORM\ManyToOne(targetEntity: Product::class, fetch: "EAGER")]
-    #[ORM\JoinColumn(name: "product_id", referencedColumnName: "id", onDelete: "CASCADE")]
+    #[ORM\ManyToOne(targetEntity: Product::class, fetch: 'EAGER')]
+    #[ORM\JoinColumn(name: 'product_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     private Product $product;
 
     #[ORM\Column(type: Types::INTEGER)]
@@ -31,14 +33,14 @@ class OrderItem
     private int $quantity;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Gedmo\Timestampable(on: "create")]
+    #[Gedmo\Timestampable(on: 'create')]
     #[SerializedName('createdAt')]
-    private \DateTime $createdAt;
+    private \DateTimeImmutable $createdAt;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Gedmo\Timestampable(on: "update")]
+    #[Gedmo\Timestampable(on: 'update')]
     #[SerializedName('updatedAt')]
-    private \DateTime $updatedAt;
+    private \DateTimeImmutable $updatedAt;
 
     public function getId(): int
     {

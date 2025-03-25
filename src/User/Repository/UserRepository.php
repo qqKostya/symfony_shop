@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\User\Repository;
 
 use App\User\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 
-class UserRepository extends ServiceEntityRepository
+final class UserRepository extends ServiceEntityRepository
 {
     private EntityManagerInterface $entityManager;
 

@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Report\Service;
 
-class KafkaProducer
+final class KafkaProducer
 {
     // Метод для отправки сообщения о начале генерации отчета
     public function produceReportGenerationEvent(string $reportId): void
@@ -10,7 +12,7 @@ class KafkaProducer
         // Логика для отправки сообщения в Kafka о начале генерации
         $message = [
             'reportId' => $reportId,
-            'status' => 'started'
+            'status'   => 'started',
         ];
 
         // отправка сообщения в Kafka
@@ -22,7 +24,7 @@ class KafkaProducer
         // Логика для отправки сообщения в Kafka о завершении генерации
         $message = [
             'reportId' => $reportId,
-            'status' => 'completed'
+            'status'   => 'completed',
         ];
 
         // отправка сообщения в Kafka

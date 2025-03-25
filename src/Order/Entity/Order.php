@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Order\Entity;
 
 use App\Order\Entity\Enum\DeliveryType;
@@ -7,12 +9,12 @@ use App\Order\Entity\Enum\OrderStatus;
 use App\User\Entity\User;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Validator\Constraints as Assert;
-use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity]
-#[ORM\Table(name: "orders", schema: 'orders')]
+#[ORM\Table(name: 'orders', schema: 'orders')]
 class Order
 {
     #[ORM\Id]
@@ -21,7 +23,7 @@ class Order
     private int $id;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(name: "user_id", referencedColumnName: "id", onDelete: "CASCADE")]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     private User $user;
 
     #[ORM\Column(type: Types::STRING)]
@@ -36,14 +38,14 @@ class Order
     private array $deliveryAddress;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Gedmo\Timestampable(on: "create")]
+    #[Gedmo\Timestampable(on: 'create')]
     #[SerializedName('createdAt')]
-    private \DateTime $createdAt;
+    private \DateTimeImmutable $createdAt;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Gedmo\Timestampable(on: "update")]
+    #[Gedmo\Timestampable(on: 'update')]
     #[SerializedName('updatedAt')]
-    private \DateTime $updatedAt;
+    private \DateTimeImmutable $updatedAt;
 
     public function getId(): int
     {
@@ -73,6 +75,7 @@ class Order
     public function setStatus(OrderStatus $status): self
     {
         $this->status = $status->value;
+
         return $this;
     }
 
@@ -84,6 +87,7 @@ class Order
     public function setDeliveryType(DeliveryType $deliveryType): self
     {
         $this->deliveryType = $deliveryType->value;
+
         return $this;
     }
 

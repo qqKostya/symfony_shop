@@ -1,18 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Cart\Entity;
 
 use App\Cart\Serializer\SerializationGroups;
 use App\Product\Entity\Product;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Validator\Constraints as Assert;
-use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity]
-#[ORM\Table(name: "cart_items", schema: 'carts')]
+#[ORM\Table(name: 'cart_items', schema: 'carts')]
 class CartItem
 {
     #[ORM\Id]
@@ -21,11 +23,11 @@ class CartItem
     private int $id;
 
     #[ORM\ManyToOne(targetEntity: Cart::class)]
-    #[ORM\JoinColumn(name: "cart_id", referencedColumnName: "id", onDelete: "CASCADE")]
+    #[ORM\JoinColumn(name: 'cart_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     private Cart $cart;
 
-    #[ORM\ManyToOne(targetEntity: Product::class, fetch: "EAGER")]
-    #[ORM\JoinColumn(name: "product_id", referencedColumnName: "id", onDelete: "CASCADE")]
+    #[ORM\ManyToOne(targetEntity: Product::class, fetch: 'EAGER')]
+    #[ORM\JoinColumn(name: 'product_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     #[Groups([SerializationGroups::CART_ITEMS_READ])]
     private Product $product;
 
@@ -35,14 +37,14 @@ class CartItem
     private int $quantity;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Gedmo\Timestampable(on: "create")]
+    #[Gedmo\Timestampable(on: 'create')]
     #[SerializedName('createdAt')]
-    private \DateTime $createdAt;
+    private \DateTimeImmutable $createdAt;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Gedmo\Timestampable(on: "update")]
+    #[Gedmo\Timestampable(on: 'update')]
     #[SerializedName('updatedAt')]
-    private \DateTime $updatedAt;
+    private \DateTimeImmutable $updatedAt;
 
     public function getId(): int
     {
