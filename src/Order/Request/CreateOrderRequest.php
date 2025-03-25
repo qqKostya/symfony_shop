@@ -7,7 +7,7 @@ namespace App\Order\Request;
 use App\Order\Entity\Enum\DeliveryType;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final readonly class RequestCreateOrder
+final readonly class CreateOrderRequest
 {
     #[Assert\NotBlank(message: 'Идентификатор пользователя обязателен')]
     #[Assert\Positive(message: 'Идентификатор пользователя должен быть положительным числом')]
@@ -28,7 +28,7 @@ final readonly class RequestCreateOrder
 
     // #[Assert\NotBlank(message: "Товары в заказе обязательны")]
     // #[Assert\Valid]
-    // public RequestCreateOrderItemsCollection $items;
+    // public CreateOrderItemsCollectionRequest $items;
     #[Assert\NotBlank(message: 'Товары в заказе обязательны')]
     #[Assert\Count(min: 1, minMessage: 'В заказе должен быть хотя бы один товар')]
     #[Assert\Count(max: 20, maxMessage: 'В заказе не может быть более 20 позиций')]

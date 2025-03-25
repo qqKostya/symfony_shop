@@ -6,7 +6,7 @@ namespace App\Order\Request;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-final readonly class RequestCreateOrderItems
+final readonly class CreateOrderItemsRequest
 {
     #[Assert\NotBlank(message: 'Идентификатор продукта обязателен')]
     #[Assert\Positive(message: 'Идентификатор продукта должен быть положительным числом')]

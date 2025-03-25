@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Cart\Controller;
 
-use App\Cart\Request\RequestItem;
+use App\Cart\Request\CartItemRequest;
 use App\Cart\Serializer\SerializationGroups;
 use App\Cart\Service\CartService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -47,7 +47,7 @@ final class CartController extends AbstractController
     #[Route('/cart/add', methods: [Request::METHOD_POST])]
     public function addItem(
         #[MapRequestPayload]
-        RequestItem $request,
+        CartItemRequest $request,
     ): JsonResponse {
         $user = $this->security->getUser();
         $this->cartService->addItemToCart($user, $request);
@@ -65,7 +65,7 @@ final class CartController extends AbstractController
     #[Route('/cart/remove', methods: [Request::METHOD_POST])]
     public function removeItem(
         #[MapRequestPayload]
-        RequestItem $request,
+        CartItemRequest $request,
     ): JsonResponse {
         $user = $this->security->getUser();
         $this->cartService->removeItemFromCart($user, $request);

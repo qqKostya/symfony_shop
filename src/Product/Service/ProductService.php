@@ -6,8 +6,8 @@ namespace App\Product\Service;
 
 use App\Product\Entity\Product;
 use App\Product\Repository\ProductRepository;
-use App\Product\Request\RequestCreateProduct;
-use App\Product\Request\RequestUpdateProduct;
+use App\Product\Request\CreateProductRequest;
+use App\Product\Request\UpdateProductRequest;
 
 final class ProductService
 {
@@ -28,7 +28,7 @@ final class ProductService
         return $this->productRepository->findAll();
     }
 
-    public function createProduct(RequestCreateProduct $request): Product
+    public function createProduct(CreateProductRequest $request): Product
     {
         $product = new Product();
         $product->setName($request->name);
@@ -45,7 +45,7 @@ final class ProductService
         return $product;
     }
 
-    public function updateProduct(int $id, RequestUpdateProduct $request): ?Product
+    public function updateProduct(int $id, UpdateProductRequest $request): ?Product
     {
         $product = $this->productRepository->findById($id);
         if (!$product) {

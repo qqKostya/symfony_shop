@@ -7,7 +7,7 @@ namespace App\Order\Request;
 use App\Order\Entity\Enum\OrderStatus;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final readonly class RequestStatus
+final readonly class StatusRequest
 {
     #[Assert\NotBlank(message: 'Идентификатор пользователя обязателен')]
     #[Assert\Positive(message: 'Идентификатор пользователя должен быть положительным числом')]

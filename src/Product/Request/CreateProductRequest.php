@@ -6,7 +6,7 @@ namespace App\Product\Request;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-final readonly class RequestCreateProduct
+final readonly class CreateProductRequest
 {
     #[Assert\NotBlank(message: 'Имя продукта обязательно')]
     #[Assert\Length(min: 2, max: 255, minMessage: 'Имя продукта должно содержать минимум {{ limit }} символов')]

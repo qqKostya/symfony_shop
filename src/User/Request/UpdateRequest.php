@@ -6,28 +6,24 @@ namespace App\User\Request;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-final readonly class RequestRegister
+final readonly class UpdateRequest
 {
-    #[Assert\NotBlank(message: 'Имя обязательно')]
     #[Assert\Length(min: 2, max: 255, minMessage: 'Имя должно содержать минимум {{ limit }} символа')]
-    public string $name;
+    public ?string $name;
 
-    #[Assert\NotBlank(message: 'Телефон обязателен')]
     #[Assert\Length(min: 10, max: 20, minMessage: 'Некорректный номер телефона')]
-    public string $phone;
+    public ?string $phone;
 
-    #[Assert\NotBlank(message: 'Email обязателен')]
     #[Assert\Email(message: 'Некорректный email')]
-    public string $email;
+    public ?string $email;
 
-    #[Assert\NotBlank(message: 'Пароль обязателен')]
     #[Assert\Length(
         min: 8,
         minMessage: 'Пароль должен быть не менее {{ limit }} символов',
     )]
-    public string $password;
+    public ?string $password;
 
-    public function __construct(string $name, string $phone, string $email, string $password)
+    public function __construct(?string $name = null, ?string $phone = null, ?string $email = null, ?string $password = null)
     {
         $this->name     = $name;
         $this->phone    = $phone;

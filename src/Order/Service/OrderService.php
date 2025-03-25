@@ -9,7 +9,7 @@ use App\Order\Entity\Enum\OrderStatus;
 use App\Order\Entity\Order;
 use App\Order\Entity\OrderItem;
 use App\Order\Repository\OrderRepository;
-use App\Order\Request\RequestCreateOrder;
+use App\Order\Request\CreateOrderRequest;
 use App\Product\Entity\Product;
 use App\User\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
@@ -39,7 +39,7 @@ final class OrderService
         ]);
     }
 
-    public function orderCreate(User $user, RequestCreateOrder $request): ?Order
+    public function orderCreate(User $user, CreateOrderRequest $request): ?Order
     {
         $order = new Order();
         $order->setUser($user);

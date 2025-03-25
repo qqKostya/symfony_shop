@@ -6,7 +6,7 @@ namespace App\Cart\Request;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-final readonly class RequestItem
+final readonly class CartItemRequest
 {
     #[Assert\NotBlank(message: 'ID товара обязательнл')]
     public int $productId;

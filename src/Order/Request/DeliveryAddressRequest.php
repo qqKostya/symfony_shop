@@ -7,7 +7,7 @@ namespace App\Order\Request;
 use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class RequestDeliveryAddress
+final class DeliveryAddressRequest
 {
     #[Assert\NotBlank(message: 'КЛАДР обязателен')]
     #[Assert\Type(type: Types::INTEGER, message: 'kladrId должен быть числом')]

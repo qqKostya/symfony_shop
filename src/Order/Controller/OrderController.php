@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Order\Controller;
 
-use App\Order\Request\RequestCreateOrder;
-use App\Order\Request\RequestStatus;
+use App\Order\Request\CreateOrderRequest;
+use App\Order\Request\StatusRequest;
 use App\Order\Service\OrderService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -46,7 +46,7 @@ final class OrderController extends AbstractController
     #[Route('/orders', methods: [Request::METHOD_POST])]
     public function createOrder(
         #[MapRequestPayload]
-        RequestCreateOrder $request,
+        CreateOrderRequest $request,
     ): JsonResponse {
         $user       = $this->security->getUser();
         $order      = $this->orderService->orderCreate($user, $request);
@@ -61,7 +61,7 @@ final class OrderController extends AbstractController
     #[Route('/orders/{id}/status', methods: [Request::METHOD_PATCH])]
     public function updateOrderStatus(
         #[MapRequestPayload]
-        RequestStatus $request,
+        StatusRequest $request,
     ): JsonResponse {
         $order = $this->orderService->changeStatus($request->orderId, $request->status);
 

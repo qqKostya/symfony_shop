@@ -6,8 +6,8 @@ namespace App\User\Service;
 
 use App\User\Entity\User;
 use App\User\Repository\UserRepository;
-use App\User\Request\RequestRegister;
-use App\User\Request\RequestUpdate;
+use App\User\Request\RegisterRequest;
+use App\User\Request\UpdateRequest;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 final class UserService
@@ -32,7 +32,7 @@ final class UserService
         return $this->userRepository->findById($userId);
     }
 
-    public function createUser(RequestRegister $request): User
+    public function createUser(RegisterRequest $request): User
     {
         $user = new User();
         $user->setName($request->name);
@@ -45,7 +45,7 @@ final class UserService
         return $user;
     }
 
-    public function updateUser(int $id, RequestUpdate $request): ?User
+    public function updateUser(int $id, UpdateRequest $request): ?User
     {
         $user = $this->userRepository->findById($id);
         if (!$user) {

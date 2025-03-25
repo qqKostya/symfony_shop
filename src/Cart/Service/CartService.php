@@ -7,7 +7,7 @@ namespace App\Cart\Service;
 use App\Cart\Entity\Cart;
 use App\Cart\Entity\CartItem;
 use App\Cart\Repository\CartRepository;
-use App\Cart\Request\RequestItem;
+use App\Cart\Request\CartItemRequest;
 use App\Product\Entity\Product;
 use App\User\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
@@ -29,7 +29,7 @@ final class CartService
         return $this->cartRepository->findOneBy(['user' => $user]);
     }
 
-    public function addItemToCart(User $user, RequestItem $request): void
+    public function addItemToCart(User $user, CartItemRequest $request): void
     {
         $cart    = $this->getCartByUser($user);
         $product = $this->entityManager->getRepository(Product::class)->find($request->productId);
@@ -59,7 +59,7 @@ final class CartService
     /**
      * @throws \Exception
      */
-    public function removeItemFromCart(User $user, RequestItem $request): void
+    public function removeItemFromCart(User $user, CartItemRequest $request): void
     {
         $cart         = $this->getCartByUser($user);
         $product      = $this->entityManager->getRepository(Product::class)->find($request->productId);

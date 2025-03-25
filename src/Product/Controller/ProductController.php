@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Product\Controller;
 
-use App\Product\Request\RequestCreateProduct;
-use App\Product\Request\RequestUpdateProduct;
+use App\Product\Request\CreateProductRequest;
+use App\Product\Request\UpdateProductRequest;
 use App\Product\Serializer\SerializationGroups;
 use App\Product\Service\ProductService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -52,7 +52,7 @@ final class ProductController extends AbstractController
     #[Route('/products', methods: [Request::METHOD_POST])]
     public function create(
         #[MapRequestPayload]
-        RequestCreateProduct $request,
+        CreateProductRequest $request,
     ): JsonResponse {
         $product = $this->productService->createProduct($request);
 
@@ -61,9 +61,9 @@ final class ProductController extends AbstractController
 
     #[Route('/products/{id}', methods: [Request::METHOD_PUT])]
     public function update(
-        int $id,
+        int                  $id,
         #[MapRequestPayload]
-        RequestUpdateProduct $request,
+        UpdateProductRequest $request,
     ): JsonResponse {
         $product = $this->productService->updateProduct($id, $request);
 

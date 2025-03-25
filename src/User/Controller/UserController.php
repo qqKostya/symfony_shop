@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\User\Controller;
 
-use App\User\Request\RequestRegister;
-use App\User\Request\RequestUpdate;
+use App\User\Request\RegisterRequest;
+use App\User\Request\UpdateRequest;
 use App\User\Serializer\SerializationGroups;
 use App\User\Service\UserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -46,7 +46,7 @@ final class UserController extends AbstractController
     #[Route('/register', methods: [Request::METHOD_POST])]
     public function create(
         #[MapRequestPayload]
-        RequestRegister $request,
+        RegisterRequest $request,
     ): JsonResponse {
         $user = $this->userService->createUser($request);
 
@@ -55,9 +55,9 @@ final class UserController extends AbstractController
 
     #[Route('/users/{id}', methods: [Request::METHOD_PUT])]
     public function update(
-        int $id,
+        int           $id,
         #[MapRequestPayload]
-        RequestUpdate $request,
+        UpdateRequest $request,
     ): JsonResponse {
         $user = $this->userService->updateUser($id, $request);
 
