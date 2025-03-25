@@ -76,4 +76,15 @@ class OrderItem
     {
         $this->quantity = $quantity;
     }
+
+
+    public function getCreatedAt(): \DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function getUpdatedAt(): \DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
 }

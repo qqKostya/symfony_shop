@@ -6,6 +6,7 @@ namespace App\Order\Controller;
 
 use App\Order\Request\CreateOrderRequest;
 use App\Order\Request\StatusRequest;
+use App\Order\Response\OrderResponse;
 use App\Order\Service\OrderService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -51,11 +52,9 @@ final class OrderController extends AbstractController
         $user       = $this->security->getUser();
         $order      = $this->orderService->orderCreate($user, $request);
         $orderItems = $this->orderService->getItemsFromOrder($order);
+        $orderResponse = new OrderResponse($order->getId(), $orderItems);
 
-        return new JsonResponse($this->serializer->normalize([
-            'order'  => $order,
-            'items' => $orderItems,
-        ], 'json'), Response::HTTP_OK);
+        return new JsonResponse($orderResponse, Response::HTTP_OK);
     }
 
     #[Route('/orders/{id}/status', methods: [Request::METHOD_PATCH])]
@@ -64,7 +63,9 @@ final class OrderController extends AbstractController
         StatusRequest $request,
     ): JsonResponse {
         $order = $this->orderService->changeStatus($request->orderId, $request->status);
+        $orderItems = $this->orderService->getItemsFromOrder($order);
+        $orderResponse = new OrderResponse($order->getId(), $orderItems);
 
-        return new JsonResponse($this->serializer->normalize($order, 'json'), Response::HTTP_OK);
+        return new JsonResponse($orderResponse, Response::HTTP_OK);
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Cart\Controller;
 
 use App\Cart\Request\CartItemRequest;
+use App\Cart\Response\CartResponse;
 use App\Cart\Serializer\SerializationGroups;
 use App\Cart\Service\CartService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -34,14 +35,10 @@ final class CartController extends AbstractController
         if ($cart === null) {
             return new JsonResponse(['error' => 'Корзина не найдена'], Response::HTTP_NOT_FOUND);
         }
+        $cartItems = $this->cartService->getItemsFromCart($cart);
+        $cartInfoResponse = new CartResponse($cart->getId(), $cartItems);
 
-        $cartInfo = [
-            'cart_id' => $cart->getId(),
-            'items'   => $this->cartService->getItemsFromCart($cart),
-        ];
-
-
-        return new JsonResponse($this->serializer->normalize($cartInfo, 'json', ['groups' => SerializationGroups::CART_ITEMS_READ]), Response::HTTP_OK);
+        return new JsonResponse($cartInfoResponse, Response::HTTP_OK);
     }
 
     #[Route('/cart/add', methods: [Request::METHOD_POST])]
@@ -54,11 +51,9 @@ final class CartController extends AbstractController
 
         $cart      = $this->cartService->getCartByUser($user);
         $cartItems = $this->cartService->getItemsFromCart($cart);
+        $cartInfoResponse = new CartResponse($cart->getId(), $cartItems);
 
-        return new JsonResponse($this->serializer->normalize([
-            'cart'  => $cart,
-            'items' => $cartItems,
-        ], 'json', ['groups' => SerializationGroups::CART_ITEMS_READ]), Response::HTTP_OK);
+        return new JsonResponse($cartInfoResponse, Response::HTTP_OK);
 
     }
 
@@ -72,11 +67,9 @@ final class CartController extends AbstractController
 
         $cart      = $this->cartService->getCartByUser($user);
         $cartItems = $this->cartService->getItemsFromCart($cart);
+        $cartInfoResponse = new CartResponse($cart->getId(), $cartItems);
 
-        return new JsonResponse($this->serializer->normalize([
-            'cart'  => $cart,
-            'items' => $cartItems,
-        ], 'json', ['groups' => SerializationGroups::CART_ITEMS_READ]), Response::HTTP_OK);
+        return new JsonResponse($cartInfoResponse, Response::HTTP_OK);
 
     }
 
