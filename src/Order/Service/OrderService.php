@@ -69,7 +69,7 @@ final class OrderService
     public function changeStatus(int $orderId, string $status): Order
     {
         $order = $this->orderRepository->findOneBy(['id' => $orderId]);
-        $order->setStatus($status);
+        $order->setStatus(OrderStatus::from($status));
         $this->orderRepository->save($order);
 
         return $order;

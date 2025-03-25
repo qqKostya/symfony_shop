@@ -61,7 +61,7 @@ final class ProductController extends AbstractController
 
     #[Route('/products/{id}', methods: [Request::METHOD_PUT])]
     public function update(
-        int                  $id,
+        int $id,
         #[MapRequestPayload]
         UpdateProductRequest $request,
     ): JsonResponse {

@@ -6,7 +6,6 @@ namespace App\Cart\Controller;
 
 use App\Cart\Request\CartItemRequest;
 use App\Cart\Response\CartResponse;
-use App\Cart\Serializer\SerializationGroups;
 use App\Cart\Service\CartService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;

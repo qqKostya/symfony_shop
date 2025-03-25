@@ -19,7 +19,7 @@ final readonly class StatusRequest
 
     public function __construct(int $orderId, string $status)
     {
-        $this->userId = $orderId;
+        $this->orderId = $orderId;
         $this->status = $status;
     }
 }

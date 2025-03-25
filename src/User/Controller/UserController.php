@@ -55,7 +55,7 @@ final class UserController extends AbstractController
 
     #[Route('/users/{id}', methods: [Request::METHOD_PUT])]
     public function update(
-        int           $id,
+        int $id,
         #[MapRequestPayload]
         UpdateRequest $request,
     ): JsonResponse {

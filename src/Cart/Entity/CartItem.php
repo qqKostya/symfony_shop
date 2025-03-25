@@ -83,7 +83,6 @@ class CartItem
         $this->quantity = $quantity;
     }
 
-
     public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
