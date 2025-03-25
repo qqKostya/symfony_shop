@@ -14,7 +14,7 @@ use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 
-#[Route('/api', name: 'api_')]
+#[Route('/api')]
 class ProductController extends AbstractController
 {
     public function __construct(
@@ -23,7 +23,7 @@ class ProductController extends AbstractController
     {
     }
 
-    #[Route('/products', name: 'product_list', methods: [Request::METHOD_GET])]
+    #[Route('/products', methods: [Request::METHOD_GET])]
     public function list(): JsonResponse
     {
         $products = $this->productService->getAllProducts();
@@ -33,7 +33,7 @@ class ProductController extends AbstractController
         );
     }
 
-    #[Route('/products/{id}', name: 'product_get', methods: [Request::METHOD_GET])]
+    #[Route('/products/{id}', methods: [Request::METHOD_GET])]
     public function getProductById(int $id): JsonResponse
     {
         $product = $this->productService->getProductById($id);
@@ -46,7 +46,7 @@ class ProductController extends AbstractController
         );
     }
 
-    #[Route('/products', name: 'product_create', methods: [Request::METHOD_POST])]
+    #[Route('/products', methods: [Request::METHOD_POST])]
     public function create(
         #[MapRequestPayload] RequestCreateProduct $request
     ): JsonResponse
@@ -55,7 +55,7 @@ class ProductController extends AbstractController
         return $this->json($product, Response::HTTP_CREATED, [], ['groups' => SerializationGroups::PRODUCT_READ]);
     }
 
-    #[Route('/products/{id}', name: 'product_update', methods: [Request::METHOD_PUT])]
+    #[Route('/products/{id}', methods: [Request::METHOD_PUT])]
     public function update(
         int                                       $id,
         #[MapRequestPayload] RequestUpdateProduct $request
@@ -73,7 +73,7 @@ class ProductController extends AbstractController
         );
     }
 
-    #[Route('/products/{id}', name: 'product_delete', methods: [Request::METHOD_DELETE])]
+    #[Route('/products/{id}', methods: [Request::METHOD_DELETE])]
     public function delete(int $id): JsonResponse
     {
         $deleted = $this->productService->deleteProduct($id);

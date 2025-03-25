@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 
 
-#[Route('/api', name: 'api_')]
+#[Route('/api')]
 class CartController extends AbstractController
 {
     public function __construct(
@@ -27,7 +27,7 @@ class CartController extends AbstractController
     {
     }
 
-    #[Route('/cart', name: 'cart_get', methods: [Request::METHOD_GET])]
+    #[Route('/cart', methods: [Request::METHOD_GET])]
     public function getCart(): JsonResponse
     {
         $user = $this->security->getUser();
@@ -47,7 +47,7 @@ class CartController extends AbstractController
     }
 
 
-    #[Route('/cart/add', name: 'cart_add_item', methods: [Request::METHOD_POST])]
+    #[Route('/cart/add', methods: [Request::METHOD_POST])]
     public function addItem(
         #[MapRequestPayload]
         RequestItem $request
@@ -66,7 +66,7 @@ class CartController extends AbstractController
 
     }
 
-    #[Route('/cart/remove', name: 'cart_remove_item', methods: [Request::METHOD_POST])]
+    #[Route('/cart/remove', methods: [Request::METHOD_POST])]
     public function removeItem(
         #[MapRequestPayload]
         RequestItem $request,
@@ -85,7 +85,7 @@ class CartController extends AbstractController
 
     }
 
-    #[Route('/cart/clear', name: 'cart_clear', methods: [Request::METHOD_DELETE])]
+    #[Route('/cart/clear', methods: [Request::METHOD_DELETE])]
     public function clearCart(): JsonResponse
     {
         $user = $this->security->getUser();

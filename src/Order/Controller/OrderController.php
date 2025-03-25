@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\SerializerInterface;
 
-#[Route('/api', name: 'api_')]
+#[Route('/api')]
 class OrderController extends AbstractController
 {
     public function __construct(
@@ -24,7 +24,7 @@ class OrderController extends AbstractController
     {
     }
 
-    #[Route('/orders', name: 'order_list', methods: [Request::METHOD_GET])]
+    #[Route('/orders', methods: [Request::METHOD_GET])]
     public function getOrders(): JsonResponse
     {
         $user = $this->security->getUser();
@@ -32,14 +32,14 @@ class OrderController extends AbstractController
         return new JsonResponse($this->serializer->normalize($orders, 'json'), Response::HTTP_OK);
     }
 
-    #[Route('/orders/{id}', name: 'order_get', methods: [Request::METHOD_GET])]
+    #[Route('/orders/{id}', methods: [Request::METHOD_GET])]
     public function getOrder(int $id): JsonResponse
     {
         $orders = $this->orderService->getOrdersById($id);
         return new JsonResponse($this->serializer->normalize($orders, 'json'), Response::HTTP_OK);
     }
 
-    #[Route('/orders', name: 'order_create', methods: [Request::METHOD_POST])]
+    #[Route('/orders', methods: [Request::METHOD_POST])]
     public function createOrder(
         #[MapRequestPayload]
         RequestCreateOrder $request
@@ -54,7 +54,7 @@ class OrderController extends AbstractController
         ], 'json'), Response::HTTP_OK);
     }
 
-    #[Route('/orders/{id}/status', name: 'order_update_status', methods: [Request::METHOD_PATCH])]
+    #[Route('/orders/{id}/status', methods: [Request::METHOD_PATCH])]
     public function updateOrderStatus(
         #[MapRequestPayload]
         RequestStatus $request

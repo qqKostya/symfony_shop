@@ -8,14 +8,14 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/api', name: 'api_')]
+#[Route('/api')]
 class ReportController extends AbstractController
 {
     public function __construct(private ReportService $reportService)
     {
     }
 
-    #[Route('/generate-report', name: 'generate_report', methods: [Request::METHOD_GET])]
+    #[Route('/generate-report', methods: [Request::METHOD_GET])]
     public function generateReport(): JsonResponse
     {
         $reportId = $this->reportService->startReportGeneration();

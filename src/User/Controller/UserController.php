@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 
 
-#[Route('/api', name: 'api_')]
+#[Route('/api')]
 class UserController extends AbstractController
 {
     public function __construct(
@@ -25,14 +25,14 @@ class UserController extends AbstractController
     }
 
 
-    #[Route('/users', name: 'user_list', methods: [Request::METHOD_GET])]
+    #[Route('/users',  methods: [Request::METHOD_GET])]
     public function list(): JsonResponse
     {
         $users = $this->userService->getAllUsers();
         return new JsonResponse($this->serializer->normalize($users, 'json', ['groups' => SerializationGroups::USER_READ]), Response::HTTP_OK);
     }
 
-    #[Route('/users/{id}', name: 'user_get', methods: [Request::METHOD_GET])]
+    #[Route('/users/{id}', methods: [Request::METHOD_GET])]
     public function getUserById(int $id): JsonResponse
     {
         $user = $this->userService->getUserById($id);
@@ -42,7 +42,7 @@ class UserController extends AbstractController
         return new JsonResponse($this->serializer->normalize($user, 'json', ['groups' => SerializationGroups::USER_READ]), Response::HTTP_OK);
     }
 
-    #[Route('/register', name: 'user_create', methods: [Request::METHOD_POST])]
+    #[Route('/register', methods: [Request::METHOD_POST])]
     public function create(
         #[MapRequestPayload]
         RequestRegister $request
@@ -52,7 +52,7 @@ class UserController extends AbstractController
         return $this->json($user, Response::HTTP_CREATED, [], ['groups' => SerializationGroups::USER_READ]);
     }
 
-    #[Route('/users/{id}', name: 'user_update', methods: [Request::METHOD_PUT])]
+    #[Route('/users/{id}', methods: [Request::METHOD_PUT])]
     public function update(
         int           $id,
         #[MapRequestPayload]
@@ -68,7 +68,7 @@ class UserController extends AbstractController
     }
 
 
-    #[Route('/users/{id}', name: 'user_delete', methods: [Request::METHOD_DELETE])]
+    #[Route('/users/{id}', methods: [Request::METHOD_DELETE])]
     public function delete(int $id): JsonResponse
     {
         $deleted = $this->userService->deleteUser($id);
