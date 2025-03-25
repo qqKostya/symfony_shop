@@ -37,7 +37,8 @@ final class OrderController extends AbstractController
     #[Route('/orders/{id}', methods: [Request::METHOD_GET])]
     public function getOrder(int $id): JsonResponse
     {
-        $orders = $this->orderService->getOrdersById($id);
+        $user   = $this->security->getUser();
+        $orders = $this->orderService->getOrdersById($id, $user);
 
         return new JsonResponse($this->serializer->normalize($orders, 'json'), Response::HTTP_OK);
     }
@@ -52,7 +53,7 @@ final class OrderController extends AbstractController
         $orderItems = $this->orderService->getItemsFromOrder($order);
 
         return new JsonResponse($this->serializer->normalize([
-            'cart'  => $order,
+            'order'  => $order,
             'items' => $orderItems,
         ], 'json'), Response::HTTP_OK);
     }

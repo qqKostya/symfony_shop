@@ -31,9 +31,12 @@ final class OrderService
         return $this->orderRepository->findBy(['user' => $user]);
     }
 
-    public function getOrdersById(int $id): ?Order
+    public function getOrdersById(int $id, User $user): ?Order
     {
-        return $this->orderRepository->findOneBy(['id' => $id]);
+        return $this->orderRepository->findOneBy([
+            'id'   => $id,
+            'user' => $user,
+        ]);
     }
 
     public function orderCreate(User $user, RequestCreateOrder $request): ?Order
