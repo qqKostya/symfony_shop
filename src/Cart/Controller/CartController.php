@@ -19,15 +19,14 @@ use Symfony\Component\Serializer\SerializerInterface;
 #[Route('/api', name: 'api_')]
 class CartController extends AbstractController
 {
-    private CartService $cartService;
-    private SerializerInterface $serializer;
-    private Security $security;
-    public function __construct(CartService $cartService, SerializerInterface $serializer, Security $security)
+    public function __construct(
+        private CartService         $cartService,
+        private SerializerInterface $serializer,
+        private Security            $security
+    )
     {
-        $this->cartService = $cartService;
-        $this->serializer = $serializer;
-        $this->security = $security;
     }
+
     #[Route('/cart', name: 'cart_get', methods: [Request::METHOD_GET])]
     public function getCart(): JsonResponse
     {
@@ -51,7 +50,7 @@ class CartController extends AbstractController
     #[Route('/cart/add', name: 'cart_add_item', methods: [Request::METHOD_POST])]
     public function addItem(
         #[MapRequestPayload]
-         RequestItem $request
+        RequestItem $request
     ): JsonResponse
     {
         $user = $this->security->getUser();

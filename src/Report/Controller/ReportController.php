@@ -11,11 +11,8 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/api', name: 'api_')]
 class ReportController extends AbstractController
 {
-    private ReportService $reportService;
-
-    public function __construct(ReportService $reportService)
+    public function __construct(private ReportService $reportService)
     {
-        $this->reportService = $reportService;
     }
 
     #[Route('/generate-report', name: 'generate_report', methods: [Request::METHOD_GET])]

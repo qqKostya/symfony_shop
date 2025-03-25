@@ -17,15 +17,13 @@ use Symfony\Component\Serializer\SerializerInterface;
 #[Route('/api', name: 'api_')]
 class OrderController extends AbstractController
 {
-    private OrderService $orderService;
-    private SerializerInterface $serializer;
-    private Security $security;
-    public function __construct(SerializerInterface $serializer, Security $security, OrderService $orderService)
+    public function __construct(
+        private OrderService        $orderService,
+        private SerializerInterface $serializer,
+        private Security            $security)
     {
-        $this->serializer = $serializer;
-        $this->security = $security;
-        $this->orderService = $orderService;
     }
+
     #[Route('/orders', name: 'order_list', methods: [Request::METHOD_GET])]
     public function getOrders(): JsonResponse
     {
@@ -33,12 +31,14 @@ class OrderController extends AbstractController
         $orders = $this->orderService->getOrdersByUser($user);
         return new JsonResponse($this->serializer->normalize($orders, 'json'), Response::HTTP_OK);
     }
+
     #[Route('/orders/{id}', name: 'order_get', methods: [Request::METHOD_GET])]
     public function getOrder(int $id): JsonResponse
     {
         $orders = $this->orderService->getOrdersById($id);
         return new JsonResponse($this->serializer->normalize($orders, 'json'), Response::HTTP_OK);
     }
+
     #[Route('/orders', name: 'order_create', methods: [Request::METHOD_POST])]
     public function createOrder(
         #[MapRequestPayload]
@@ -46,7 +46,7 @@ class OrderController extends AbstractController
     ): JsonResponse
     {
         $user = $this->security->getUser();
-        $order = $this->orderService->orderCreate($user,$request);
+        $order = $this->orderService->orderCreate($user, $request);
         $orderItems = $this->orderService->getItemsFromOrder($order);
         return new JsonResponse($this->serializer->normalize([
             'cart' => $order,

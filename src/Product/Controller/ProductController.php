@@ -17,13 +17,10 @@ use Symfony\Component\Serializer\SerializerInterface;
 #[Route('/api', name: 'api_')]
 class ProductController extends AbstractController
 {
-    private ProductService $productService;
-    private SerializerInterface $serializer;
-
-    public function __construct(ProductService $productService, SerializerInterface $serializer)
+    public function __construct(
+        private ProductService      $productService,
+        private SerializerInterface $serializer)
     {
-        $this->productService = $productService;
-        $this->serializer = $serializer;
     }
 
     #[Route('/products', name: 'product_list', methods: [Request::METHOD_GET])]
@@ -52,16 +49,18 @@ class ProductController extends AbstractController
     #[Route('/products', name: 'product_create', methods: [Request::METHOD_POST])]
     public function create(
         #[MapRequestPayload] RequestCreateProduct $request
-    ): JsonResponse {
+    ): JsonResponse
+    {
         $product = $this->productService->createProduct($request);
         return $this->json($product, Response::HTTP_CREATED, [], ['groups' => SerializationGroups::PRODUCT_READ]);
     }
 
     #[Route('/products/{id}', name: 'product_update', methods: [Request::METHOD_PUT])]
     public function update(
-        int $id,
+        int                                       $id,
         #[MapRequestPayload] RequestUpdateProduct $request
-    ): JsonResponse {
+    ): JsonResponse
+    {
         $product = $this->productService->updateProduct($id, $request);
 
         if (!$product) {

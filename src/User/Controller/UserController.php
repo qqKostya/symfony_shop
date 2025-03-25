@@ -18,13 +18,10 @@ use Symfony\Component\Serializer\SerializerInterface;
 #[Route('/api', name: 'api_')]
 class UserController extends AbstractController
 {
-    private SerializerInterface $serializer;
-    private UserService $userService;
-
-    public function __construct(UserService $userService, SerializerInterface $serializer)
+    public function __construct(
+        private SerializerInterface $serializer,
+        private UserService         $userService)
     {
-        $this->userService = $userService;
-        $this->serializer = $serializer;
     }
 
 
@@ -57,9 +54,9 @@ class UserController extends AbstractController
 
     #[Route('/users/{id}', name: 'user_update', methods: [Request::METHOD_PUT])]
     public function update(
-        int                    $id,
+        int           $id,
         #[MapRequestPayload]
-        RequestUpdate          $request): JsonResponse
+        RequestUpdate $request): JsonResponse
     {
         $user = $this->userService->updateUser($id, $request);
 
