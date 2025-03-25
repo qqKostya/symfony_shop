@@ -27,13 +27,13 @@ class Cart
     #[Groups([SerializationGroups::CART_READ, SerializationGroups::CART_WRITE])]
     private User $user;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     #[Gedmo\Timestampable(on: 'create')]
     #[SerializedName('createdAt')]
     #[Groups([SerializationGroups::CART_READ])]
     private \DateTimeImmutable $createdAt;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     #[Gedmo\Timestampable(on: 'update')]
     #[SerializedName('updatedAt')]
     #[Groups([SerializationGroups::CART_READ])]
@@ -52,5 +52,15 @@ class Cart
     public function setUser(User $user): void
     {
         $this->user = $user;
+    }
+
+    public function getCreatedAt(): \DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function getUpdatedAt(): \DateTimeImmutable
+    {
+        return $this->updatedAt;
     }
 }

@@ -37,12 +37,12 @@ class Order
     #[ORM\Column(type: Types::JSON)]
     private array $deliveryAddress;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     #[Gedmo\Timestampable(on: 'create')]
     #[SerializedName('createdAt')]
     private \DateTimeImmutable $createdAt;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     #[Gedmo\Timestampable(on: 'update')]
     #[SerializedName('updatedAt')]
     private \DateTimeImmutable $updatedAt;

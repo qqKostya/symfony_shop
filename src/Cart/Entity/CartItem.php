@@ -36,14 +36,16 @@ class CartItem
     #[Groups([SerializationGroups::CART_ITEMS_READ])]
     private int $quantity;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     #[Gedmo\Timestampable(on: 'create')]
     #[SerializedName('createdAt')]
+    #[Groups([SerializationGroups::CART_READ])]
     private \DateTimeImmutable $createdAt;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     #[Gedmo\Timestampable(on: 'update')]
     #[SerializedName('updatedAt')]
+    #[Groups([SerializationGroups::CART_READ])]
     private \DateTimeImmutable $updatedAt;
 
     public function getId(): int
@@ -79,5 +81,16 @@ class CartItem
     public function setQuantity(int $quantity): void
     {
         $this->quantity = $quantity;
+    }
+
+
+    public function getCreatedAt(): \DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function getUpdatedAt(): \DateTimeImmutable
+    {
+        return $this->updatedAt;
     }
 }

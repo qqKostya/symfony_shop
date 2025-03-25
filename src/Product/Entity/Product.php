@@ -62,13 +62,13 @@ class Product
     #[Groups([SerializationGroups::PRODUCT_READ, SerializationGroups::PRODUCT_WRITE])]
     private ?int $length;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     #[Gedmo\Timestampable(on: 'create')]
     #[SerializedName('createdAt')]
     #[Groups([SerializationGroups::PRODUCT_READ])]
     private \DateTimeImmutable $createdAt;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     #[Gedmo\Timestampable(on: 'update')]
     #[SerializedName('updatedAt')]
     #[Groups([SerializationGroups::PRODUCT_READ])]
@@ -157,5 +157,15 @@ class Product
     public function setLength(?int $length): void
     {
         $this->length = $length;
+    }
+
+    public function getCreatedAt(): \DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function getUpdatedAt(): \DateTimeImmutable
+    {
+        return $this->updatedAt;
     }
 }

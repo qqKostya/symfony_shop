@@ -53,13 +53,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups([SerializationGroups::USER_WRITE])]
     private string $passwordHash;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     #[Gedmo\Timestampable(on: 'create')]
     #[Groups([SerializationGroups::USER_READ])]
     #[SerializedName('createdAt')]
     private \DateTimeImmutable $createdAt;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     #[Gedmo\Timestampable(on: 'update')]
     #[Groups([SerializationGroups::USER_READ])]
     #[SerializedName('updatedAt')]
@@ -133,13 +133,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getUpdatedAt(): \DateTimeImmutable
     {
         return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(\DateTimeImmutable $updatedAt): self
-    {
-        $this->updatedAt = $updatedAt;
-
-        return $this;
     }
 
     public function getUserIdentifier(): string

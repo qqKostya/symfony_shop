@@ -39,8 +39,6 @@ final class UserService
         $user->setPhone($request->phone);
         $user->setEmail($request->email);
         $user->setPasswordHash($this->passwordHasher->hashPassword($user, $request->password));
-        $user->setCreatedAt(new \DateTimeImmutable());
-        $user->setUpdatedAt(new \DateTimeImmutable());
 
         $this->userRepository->save($user);
 
