@@ -44,6 +44,18 @@ class Order
     #[SerializedName('updatedAt')]
     private \DateTimeImmutable $updatedAt;
 
+    public function __construct(
+        User $user,
+        OrderStatus $status,
+        array $deliveryAddress,
+        DeliveryType $deliveryType,
+    ) {
+        $this->user = $user;
+        $this->status = $status;
+        $this->deliveryAddress = $deliveryAddress;
+        $this->deliveryType = $deliveryType;
+    }
+
     public function getId(): int
     {
         return $this->id;

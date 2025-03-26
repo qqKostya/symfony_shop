@@ -42,21 +42,26 @@ final class OrderService
         ]);
     }
 
-    public function orderCreate(User $user, CreateOrderRequest $request): ?Order
+    public function orderCreate(User $user, CreateOrderRequest $request): Order
     {
-        $order = new Order();
-        $order->setUser($user);
-        $order->setStatus(OrderStatus::from($request->status));
-        $order->setDeliveryAddress($request->deliveryAddress);
-        $order->setDeliveryType(DeliveryType::from($request->deliveryType));
+        $order = new Order(
+            $user,
+            OrderStatus::from($request->status),
+            [
+                'kladrId' => $request->deliveryAddress->kladrId,
+                'fullAddress' => $request->deliveryAddress->fullAddress,
+            ],
+            DeliveryType::from($request->deliveryType),
+        );
+
         $this->orderRepository->save($order);
 
         foreach ($request->items as $item) {
             $orderItem = new OrderItem();
             $orderItem->setOrder($order);
-            $product = $this->entityManager->getRepository(Product::class)->find($item['productId']);
+            $product = $this->entityManager->getRepository(Product::class)->find($item->productId);
             $orderItem->setProduct($product);
-            $orderItem->setQuantity($item['quantity']);
+            $orderItem->setQuantity($item->quantity);
             $this->entityManager->persist($orderItem);
         }
 
@@ -70,12 +75,15 @@ final class OrderService
         return $this->entityManager->getRepository(OrderItem::class)->findBy(['order' => $order]);
     }
 
-    public function changeStatus(int $orderId, string $status): Order
+    public function changeStatus(int $orderId, string $status): void
     {
         $order = $this->orderRepository->findOneBy(['id' => $orderId]);
+
+        if ($order === null) {
+            throw new \RuntimeException('Order not found.');
+        }
+
         $order->setStatus(OrderStatus::from($status));
         $this->orderRepository->save($order);
-
-        return $order;
     }
 }

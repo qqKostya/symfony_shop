@@ -67,10 +67,8 @@ final class OrderController extends AbstractController
         #[MapRequestPayload]
         StatusRequest $request,
     ): JsonResponse {
-        $order = $this->orderService->changeStatus($request->orderId, $request->status);
-        $orderItems = $this->orderService->getItemsFromOrder($order);
-        $orderResponse = new OrderResponse($order->getId(), $orderItems);
+        $this->orderService->changeStatus($request->orderId, $request->status);
 
-        return new JsonResponse($orderResponse, Response::HTTP_OK);
+        return new JsonResponse(['message' => "Статус заказа  №{$request->orderId} изменен на '{$request->status}'."], Response::HTTP_OK);
     }
 }
