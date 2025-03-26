@@ -28,7 +28,10 @@ final class OrderService
 
     public function getOrdersByUser(?User $user): array
     {
-        return $this->orderRepository->findBy(['user' => $user]);
+        return $this->orderRepository->findBy(
+            ['user' => $user],
+            ['createdAt' => 'DESC'],
+        );
     }
 
     public function getOrdersById(int $id, User $user): ?Order
@@ -55,8 +58,9 @@ final class OrderService
             $orderItem->setProduct($product);
             $orderItem->setQuantity($item['quantity']);
             $this->entityManager->persist($orderItem);
-            $this->entityManager->flush();
         }
+
+        $this->entityManager->flush();
 
         return $order;
     }

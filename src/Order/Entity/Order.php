@@ -11,7 +11,6 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Serializer\Annotation\SerializedName;
-use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'orders', schema: 'orders')]
@@ -26,13 +25,11 @@ class Order
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     private User $user;
 
-    #[ORM\Column(type: Types::STRING)]
-    #[Assert\Choice(callback: [OrderStatus::class, 'cases'])]
-    private string $status;
+    #[ORM\Column(enumType: OrderStatus::class)]
+    private OrderStatus $status = OrderStatus::PAID;
 
-    #[ORM\Column(type: Types::STRING)]
-    #[Assert\Choice(callback: [DeliveryType::class, 'cases'])]
-    private string $deliveryType;
+    #[ORM\Column(enumType: DeliveryType::class)]
+    private DeliveryType $deliveryType = DeliveryType::COURIER;
 
     #[ORM\Column(type: Types::JSON)]
     private array $deliveryAddress;
@@ -74,25 +71,25 @@ class Order
 
     public function setStatus(OrderStatus $status): self
     {
-        $this->status = $status->value;
+        $this->status = $status;
 
         return $this;
     }
 
     public function getStatus(): OrderStatus
     {
-        return OrderStatus::from($this->status);
+        return $this->status;
     }
 
     public function setDeliveryType(DeliveryType $deliveryType): self
     {
-        $this->deliveryType = $deliveryType->value;
+        $this->deliveryType = $deliveryType;
 
         return $this;
     }
 
     public function getDeliveryType(): DeliveryType
     {
-        return DeliveryType::from($this->deliveryType);
+        return $this->deliveryType;
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Order\Request;
 
 use App\Order\Entity\Enum\DeliveryType;
+use App\Order\Entity\Enum\OrderStatus;
 use Symfony\Component\Validator\Constraints as Assert;
 
 final readonly class CreateOrderRequest
@@ -14,12 +15,12 @@ final readonly class CreateOrderRequest
     public int $userId;
 
     #[Assert\NotBlank(message: 'Статус заказа обязателен')]
-    #[Assert\Choice(callback: 'App\Order\Entity\Enum\OrderStatus::getValues', message: 'Недопустимый статус заказа')]
+    #[Assert\Choice(callback: [OrderStatus::class, 'getValues'], message: 'Недопустимый статус заказа')]
     public string $status;
 
     #[Assert\NotBlank(message: 'Тип доставки обязателен')]
     // #[Assert\Choice(callback: [DeliveryType::class, 'cases'], message: "Недопустимый тип доставки")]
-    #[Assert\Choice(callback: 'App\Order\Entity\Enum\DeliveryType::getValues', message: 'Недопустимый статус доставки')]
+    #[Assert\Choice(callback: [DeliveryType::class, 'getValues'], message: 'Недопустимый статус доставки')]
     public string $deliveryType;
 
     #[Assert\NotBlank(message: 'Адрес доставки обязателен')]

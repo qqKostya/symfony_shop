@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -39,9 +40,13 @@ final class OrderController extends AbstractController
     public function getOrder(int $id): JsonResponse
     {
         $user   = $this->security->getUser();
-        $orders = $this->orderService->getOrdersById($id, $user);
+        $order = $this->orderService->getOrdersById($id, $user);
 
-        return new JsonResponse($this->serializer->normalize($orders, 'json'), Response::HTTP_OK);
+        if ($order === null) {
+            throw new NotFoundHttpException('Заказ не найден');
+        }
+
+        return new JsonResponse($this->serializer->normalize($order, 'json'), Response::HTTP_OK);
     }
 
     #[Route('/orders', methods: [Request::METHOD_POST])]
