@@ -1,0 +1,18 @@
+user:
+  not_found: 'Пользователь не найден'
+  deleted_successfully: 'Пользователь успешно удален'
+
+order:
+  not_found: 'Заказ не найден'
+  status_updated: "Статус заказа №%id% изменен на '%status%'"
+
+product:
+  not_found: 'Товар не найден'
+  deleted_successfully: 'Товар успешно удален'
+
+cart:
+  not_found: 'Корзина не найдена'
+  cleared: 'Корзина и все товары в ней удалены'
+
+report:
+  generated: 'Отчет успешно создан'

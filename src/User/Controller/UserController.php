@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/api')]
 final class UserController extends AbstractController
@@ -22,6 +23,7 @@ final class UserController extends AbstractController
     public function __construct(
         private SerializerInterface $serializer,
         private UserService $userService,
+        private TranslatorInterface $translator,
     ) {}
 
     #[Route('/users', methods: [Request::METHOD_GET])]
@@ -37,7 +39,7 @@ final class UserController extends AbstractController
     {
         $user = $this->userService->getUserById($id);
         if (!$user) {
-            return new JsonResponse(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
+            return new JsonResponse(['error' => $this->translator->trans('user.not_found')], Response::HTTP_NOT_FOUND);
         }
 
         return new JsonResponse($this->serializer->normalize($user, 'json', ['groups' => SerializationGroups::USER_READ]), Response::HTTP_OK);
@@ -62,7 +64,7 @@ final class UserController extends AbstractController
         $user = $this->userService->updateUser($id, $request);
 
         if (!$user) {
-            return new JsonResponse(['error' => 'Пользователь не найден'], Response::HTTP_NOT_FOUND);
+            return new JsonResponse(['error' => $this->translator->trans('user.not_found')], Response::HTTP_NOT_FOUND);
         }
 
         return new JsonResponse($this->serializer->normalize($user, 'json', ['groups' => SerializationGroups::USER_READ]), Response::HTTP_OK);
@@ -74,9 +76,9 @@ final class UserController extends AbstractController
         $deleted = $this->userService->deleteUser($id);
 
         if (!$deleted) {
-            return new JsonResponse(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
+            return new JsonResponse(['error' => $this->translator->trans('user.not_found')], Response::HTTP_NOT_FOUND);
         }
 
-        return new JsonResponse(['message' => 'User deleted successfully'], Response::HTTP_NO_CONTENT);
+        return new JsonResponse(['message' => $this->translator->trans('user.deleted_successfully')], Response::HTTP_NO_CONTENT);
     }
 }

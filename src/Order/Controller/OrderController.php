@@ -17,6 +17,7 @@ use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/api')]
 final class OrderController extends AbstractController
@@ -25,6 +26,7 @@ final class OrderController extends AbstractController
         private OrderService $orderService,
         private SerializerInterface $serializer,
         private Security $security,
+        private TranslatorInterface $translator,
     ) {}
 
     #[Route('/orders', methods: [Request::METHOD_GET])]
@@ -43,7 +45,7 @@ final class OrderController extends AbstractController
         $order = $this->orderService->getOrdersById($id, $user);
 
         if ($order === null) {
-            throw new NotFoundHttpException('Заказ не найден');
+            throw new NotFoundHttpException($this->translator->trans('order.not_found'));
         }
 
         return new JsonResponse($this->serializer->normalize($order, 'json'), Response::HTTP_OK);
@@ -69,6 +71,8 @@ final class OrderController extends AbstractController
     ): JsonResponse {
         $this->orderService->changeStatus($request->orderId, $request->status);
 
-        return new JsonResponse(['message' => "Статус заказа  №{$request->orderId} изменен на '{$request->status}'."], Response::HTTP_OK);
+        return new JsonResponse([
+            'message' => $this->translator->trans('order.status_updated', ['%id%' => $request->orderId, '%status%' => $request->status]),
+        ], Response::HTTP_OK);
     }
 }

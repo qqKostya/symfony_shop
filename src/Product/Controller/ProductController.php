@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/api')]
 final class ProductController extends AbstractController
@@ -22,6 +23,7 @@ final class ProductController extends AbstractController
     public function __construct(
         private ProductService $productService,
         private SerializerInterface $serializer,
+        private TranslatorInterface $translator,
     ) {}
 
     #[Route('/products', methods: [Request::METHOD_GET])]
@@ -40,7 +42,7 @@ final class ProductController extends AbstractController
     {
         $product = $this->productService->getProductById($id);
         if (!$product) {
-            return new JsonResponse(['error' => 'Product not found'], Response::HTTP_NOT_FOUND);
+            return new JsonResponse(['error' => $this->translator->trans('product.not_found')], Response::HTTP_NOT_FOUND);
         }
 
         return new JsonResponse(
@@ -68,7 +70,7 @@ final class ProductController extends AbstractController
         $product = $this->productService->updateProduct($id, $request);
 
         if (!$product) {
-            return new JsonResponse(['error' => 'Product not found'], Response::HTTP_NOT_FOUND);
+            return new JsonResponse(['error' => $this->translator->trans('product.not_found')], Response::HTTP_NOT_FOUND);
         }
 
         return new JsonResponse(
@@ -83,9 +85,9 @@ final class ProductController extends AbstractController
         $deleted = $this->productService->deleteProduct($id);
 
         if (!$deleted) {
-            return new JsonResponse(['error' => 'Product not found'], Response::HTTP_NOT_FOUND);
+            return new JsonResponse(['error' => $this->translator->trans('product.not_found')], Response::HTTP_NOT_FOUND);
         }
 
-        return new JsonResponse(['message' => 'Product deleted successfully'], Response::HTTP_NO_CONTENT);
+        return new JsonResponse(['message' => $this->translator->trans('product.deleted_successfully')], Response::HTTP_NO_CONTENT);
     }
 }

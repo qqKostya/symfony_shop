@@ -14,15 +14,15 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/api')]
 final class CartController extends AbstractController
 {
     public function __construct(
         private CartService $cartService,
-        private SerializerInterface $serializer,
         private Security $security,
+        private TranslatorInterface $translator,
     ) {}
 
     #[Route('/cart', methods: [Request::METHOD_GET])]
@@ -32,7 +32,7 @@ final class CartController extends AbstractController
         $cart = $this->cartService->getCartByUser($user);
 
         if ($cart === null) {
-            return new JsonResponse(['error' => 'Корзина не найдена'], Response::HTTP_NOT_FOUND);
+            return new JsonResponse(['error' => $this->translator->trans('cart.not_found')], Response::HTTP_NOT_FOUND);
         }
         $cartItems = $this->cartService->getItemsFromCart($cart);
         $cartInfoResponse = new CartResponse($cart->getId(), $cartItems);
@@ -78,6 +78,6 @@ final class CartController extends AbstractController
         $user = $this->security->getUser();
         $this->cartService->deleteCart($user);
 
-        return new JsonResponse(['message' => 'Корзина и все товары в ней удалены'], Response::HTTP_OK);
+        return new JsonResponse(['message' => $this->translator->trans('cart.cleared')], Response::HTTP_OK);
     }
 }
