@@ -12,8 +12,6 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Uid\Uuid;
 
 final class ReportService
 {
@@ -23,7 +21,6 @@ final class ReportService
         private KafkaProducer $kafkaProducer,
         private EntityManagerInterface $entityManager,
         private Filesystem $filesystem,
-        private SerializerInterface $serializer,
     ) {
         // Создаем директорию, если ее нет
         if (!$this->filesystem->exists(self::REPORTS_DIR)) {
