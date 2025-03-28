@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\User\Entity;
 
 use App\User\Serializer\SerializationGroups;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -64,6 +65,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups([SerializationGroups::USER_READ])]
     #[SerializedName('updatedAt')]
     private \DateTimeImmutable $updatedAt;
+
+    #[ORM\ManyToMany(targetEntity: Role::class)]
+    #[ORM\JoinTable(name: 'user_roles')]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id')]
+    #[ORM\InverseJoinColumn(name: 'role_id', referencedColumnName: 'id')]
+    #[Groups([SerializationGroups::USER_READ])]
+    private iterable $roles;
+
+    public function __construct()
+    {
+        $this->roles = new ArrayCollection();
+    }
 
     public function getId(): int
     {
@@ -142,8 +155,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRoles(): array
     {
-        // TODO: add role admin
-        return ['ROLE_USER'];
+        return array_map(static fn(Role $role) => $role->getName(), $this->roles->toArray());
+    }
+
+    public function addRole(Role $role): self
+    {
+        if (!$this->roles->contains($role)) {
+            $this->roles[] = $role;
+        }
+
+        return $this;
+    }
+
+    public function removeRole(Role $role): self
+    {
+        $this->roles->removeElement($role);
+
+        return $this;
     }
 
     public function getSalt(): ?string

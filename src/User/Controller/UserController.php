@@ -26,7 +26,7 @@ final class UserController extends AbstractController
         private TranslatorInterface $translator,
     ) {}
 
-    #[Route('/users', methods: [Request::METHOD_GET])]
+    #[Route('/admin/users', methods: [Request::METHOD_GET])]
     public function list(): JsonResponse
     {
         $users = $this->userService->getAllUsers();

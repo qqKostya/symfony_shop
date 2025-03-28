@@ -15,7 +15,7 @@ final class ReportController extends AbstractController
 {
     public function __construct(private ReportService $reportService) {}
 
-    #[Route('/generate-report', methods: [Request::METHOD_GET])]
+    #[Route('/admin/generate-report', methods: [Request::METHOD_GET])]
     public function generateReport(): JsonResponse
     {
         $reportId = $this->reportService->startReportGeneration();

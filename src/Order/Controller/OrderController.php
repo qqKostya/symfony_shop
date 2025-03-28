@@ -64,7 +64,7 @@ final class OrderController extends AbstractController
         return new JsonResponse($orderResponse, Response::HTTP_OK);
     }
 
-    #[Route('/orders/{id}/status', methods: [Request::METHOD_PATCH])]
+    #[Route('/admin/orders/{id}/status', methods: [Request::METHOD_PATCH])]
     public function updateOrderStatus(
         #[MapRequestPayload]
         StatusRequest $request,
