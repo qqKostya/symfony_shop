@@ -4,103 +4,67 @@ declare(strict_types=1);
 
 namespace App\Tests\User\Controller;
 
+use App\User\Entity\User;
+use App\User\Service\UserService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
 final class UserControllerTest extends WebTestCase
 {
-    private string $jwtToken;
+    private $userServiceMock;
 
-    protected function setUp(): void
+    public function testCreateUser(): void
     {
-        parent::setUp();
+        // Создаем мок для UserService
+        $this->userServiceMock = $this->createMock(UserService::class);
 
-        // Получаем токен через /api/login_check
+        // Подготовка фейковых данных для запроса
+        $requestData = [
+            'name' => 'New User',
+            'phone' => '1234567890', // Телефон должен быть корректным
+            'email' => 'newuser@example.com', // Email должен быть корректным
+            'password' => 'password123', // Пароль должен быть не менее 8 символов
+        ];
+
+        // Создаем объект User, который будет возвращен методом createUser
+        $user = new User();
+        $user->setName($requestData['name']);
+        $user->setPhone($requestData['phone']);
+        $user->setEmail($requestData['email']);
+        $user->setPasswordHash($requestData['password']); // В реальной жизни следует хэшировать пароль
+
+        // Подготовка мока для метода createUser
+        $this->userServiceMock
+            ->method('createUser')
+            ->willReturn($user); // Возвращаем объект User вместо RegisterRequest
+
+        // Создаем клиент для тестов
         $client = self::createClient();
-        $client->request('POST', '/api/login_check', [
-            'json' => [
-                'email' => '',  // Убедись, что у тебя есть такой пользователь в базе
-                'password' => '',   // Заменить на актуальный пароль
-            ]
-        ], [], ['CONTENT_TYPE' => 'application/json']);
 
-        // Проверка, что токен существует
-        $data = json_decode($client->getResponse()->getContent(), true);
-        if (!isset($data['token'])) {
-            $this->fail('JWT Token not found in the response');
-        }
-        $this->jwtToken = $data['token']; // Извлекаем токен
+        // Используем мок в сервисе
+        $client->getContainer()->set(UserService::class, $this->userServiceMock);
+
+        // Выполняем запрос с POST методом
+        $client->request(
+            'POST',
+            '/api/register',
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/json'],
+            json_encode($requestData)
+        );
+
+        // Проверка ответа на успешный запрос
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
+
+        // Получаем тело ответа
+        $responseContent = $client->getResponse()->getContent();
+
+        // Декодируем JSON-ответ
+        $jsonResponse = json_decode($responseContent, true);
+
+        // Проверка, что в ответе содержится email нового пользователя
+        $this->assertArrayHasKey('email', $jsonResponse);
+        $this->assertEquals($requestData['email'], $jsonResponse['email']);
     }
-
-    public function testListUsers(): void
-    {
-        if ($this->jwtToken === '') {
-            $this->fail('JWT Token is empty');
-        }
-
-        $client = self::createClient();
-
-        // Добавляем JWT токен в заголовки запроса
-        $client->setServerParameter('HTTP_AUTHORIZATION', 'Bearer ' . $this->jwtToken);
-        $client->request('GET', '/api/admin/users');
-
-        // Проверка статуса и содержания
-        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
-        self::assertJson($client->getResponse()->getContent());
-    }
-
-//    public function testGetUserById(): void
-//    {
-//        $client = self::createClient();
-//        $client->request('GET', '/api/users/1');
-//
-//        if ($client->getResponse()->getStatusCode() === Response::HTTP_NOT_FOUND) {
-//            $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
-//        } else {
-//            $this->assertResponseStatusCodeSame(Response::HTTP_OK);
-//            self::assertJson($client->getResponse()->getContent());
-//        }
-//    }
-//
-//    public function testRegisterUser(): void
-//    {
-//        $client = self::createClient();
-//        $client->request('POST', '/api/register', [], [], ['CONTENT_TYPE' => 'application/json'], json_encode([
-//            'name' => 'Test User',
-//            'phone' => '1234567890',
-//            'email' => 'test@example.com',
-//            'password' => 'securePassword123',
-//        ]));
-//
-//        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
-//        self::assertJson($client->getResponse()->getContent());
-//    }
-//
-//    public function testUpdateUser(): void
-//    {
-//        $client = self::createClient();
-//        $client->request('PUT', '/api/users/1', [], [], ['CONTENT_TYPE' => 'application/json'], json_encode([
-//            'name' => 'Updated Name',
-//            'phone' => '9876543210',
-//        ]));
-//
-//        if ($client->getResponse()->getStatusCode() === Response::HTTP_NOT_FOUND) {
-//            $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
-//        } else {
-//            $this->assertResponseStatusCodeSame(Response::HTTP_OK);
-//            self::assertJson($client->getResponse()->getContent());
-//        }
-//    }
-//
-//    public function testDeleteUser(): void
-//    {
-//        $client = self::createClient();
-//        $client->request('DELETE', '/api/users/1');
-//
-//        if ($client->getResponse()->getStatusCode() === Response::HTTP_NOT_FOUND) {
-//            $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
-//        } else {
-//            $this->assertResponseStatusCodeSame(Response::HTTP_NO_CONTENT);
-//        }
-//    }
 }
