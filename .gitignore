@@ -93,3 +93,4 @@
 
 /var/reports/
 .phpunit.cache/
+.env.test.local

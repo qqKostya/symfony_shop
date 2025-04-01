@@ -10,7 +10,7 @@ use App\User\Request\RegisterRequest;
 use App\User\Request\UpdateRequest;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class UserService
+final class UserService
 {
     private UserRepository $userRepository;
 
