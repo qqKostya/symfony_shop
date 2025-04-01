@@ -92,4 +92,4 @@
 ###< friendsofphp/php-cs-fixer ###
 
 /var/reports/
-
+.phpunit.cache/
