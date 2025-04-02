@@ -13,6 +13,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class UserControllerTest extends WebTestCase
 {
+    private const ADMIN_EMAIL = 'admin@example.com';
+    private const ADMIN_PASSWORD = 'password123';
     private User $admin;
 
     /**
@@ -21,27 +23,21 @@ final class UserControllerTest extends WebTestCase
     private function createAdminUser(): void
     {
         $entityManager = self::getContainer()->get('doctrine')->getManager();
-        $admin = $entityManager->getRepository(User::class)->findOneBy(['email' => 'admin@example.com']);
 
-        if ($admin) {
-            $this->admin = $admin;
+        // Проверка, существует ли администратор с таким email
+        $existingUser = $entityManager->getRepository(User::class)->findOneBy(['email' => self::ADMIN_EMAIL]);
+
+        if ($existingUser) {
+            $this->admin = $existingUser;
             return;
         }
 
+        // Создание нового администратора
         $this->admin = new User();
         $this->admin->setName('Admin');
-        $this->admin->setPhone('9999999999');
-        $this->admin->setEmail('admin@example.com');
-        $this->admin->setPasswordHash(password_hash('password123', PASSWORD_BCRYPT));
+        $this->admin->setEmail(self::ADMIN_EMAIL);
+        $this->admin->setPasswordHash(password_hash(self::ADMIN_PASSWORD, PASSWORD_BCRYPT));
 
-        $roleRepo = $entityManager->getRepository(Role::class);
-        $roleAdmin = $roleRepo->findOneBy(['name' => 'ROLE_ADMIN']) ?? new Role('ROLE_ADMIN');
-        if (!$roleAdmin->getId()) {
-            $entityManager->persist($roleAdmin);
-            $entityManager->flush();
-        }
-
-        $this->admin->addRole($roleAdmin);
         $entityManager->persist($this->admin);
         $entityManager->flush();
     }
@@ -54,8 +50,8 @@ final class UserControllerTest extends WebTestCase
         $client = static::createClient();
         $this->createAdminUser();  // Создание или получение существующего администратора
         $client->jsonRequest('POST', '/api/login_check', [
-            'email' => 'admin@example.com',
-            'password' => 'password123',
+            'email' => self::ADMIN_EMAIL,
+            'password' => self::ADMIN_PASSWORD,
         ]);
 
         $data = json_decode($client->getResponse()->getContent(), true);
