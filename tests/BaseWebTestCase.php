@@ -8,6 +8,7 @@ use App\User\Entity\Role;
 use App\User\Entity\User;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 abstract class BaseWebTestCase extends WebTestCase
 {
@@ -116,5 +117,20 @@ abstract class BaseWebTestCase extends WebTestCase
         $client->setServerParameter('HTTP_Authorization', \sprintf('Bearer %s', $data['token']));
 
         return $client;
+    }
+
+    /**
+     * Получение текущего авторизованного пользователя.
+     */
+    protected function getAuthenticatedUser(): User
+    {
+        $tokenStorage = self::getContainer()->get(TokenStorageInterface::class);
+        $token = $tokenStorage->getToken();
+
+        if (!$token || !$token->getUser()) {
+            throw new \RuntimeException('No authenticated user found.');
+        }
+
+        return $token->getUser();
     }
 }
