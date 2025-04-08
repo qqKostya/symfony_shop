@@ -22,7 +22,6 @@ final class ReportService
         private EntityManagerInterface $entityManager,
         private Filesystem $filesystem,
     ) {
-        // Создаем директорию, если ее нет
         if (!$this->filesystem->exists(self::REPORTS_DIR)) {
             $this->filesystem->mkdir(self::REPORTS_DIR);
         }
@@ -30,7 +29,7 @@ final class ReportService
 
     public function startReportGeneration(): string
     {
-        $reportId = uniqid(); // Генерируем UUID вместо uniqid
+        $reportId = uniqid();
 
         $this->generateReportFile($reportId);
         $this->kafkaProducer->produceReportGenerationEvent($reportId);
@@ -82,18 +81,15 @@ final class ReportService
         $soldItems = $this->getSoldItems();
         $filePath = $this->getReportFilePath($reportId);
 
-        // Создаем новый Excel-документ
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        // Заголовки
         $sheet->setCellValue('A1', 'ID заказа');
         $sheet->setCellValue('B1', 'ID пользователя');
         $sheet->setCellValue('C1', 'Название товара');
         $sheet->setCellValue('D1', 'Цена');
         $sheet->setCellValue('E1', 'Количество');
 
-        // Добавляем данные
         $row = 2;
         foreach ($soldItems as $item) {
             $sheet->setCellValue("A{$row}", $item['order_id']);

@@ -16,6 +16,7 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
+// TODO: объединить с ролями
 // #[ORM\Table(name: "users", schema: 'users')]
 #[ORM\Table(name: 'users')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -42,7 +43,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups([SerializationGroups::USER_READ, SerializationGroups::USER_WRITE])]
     private string $email;
 
-    // TODO: Length скорей всего не актуален так как мы храним хэш
     #[ORM\Column(type: Types::STRING, length: 255)]
     #[Assert\NotBlank]
     #[Assert\Length(

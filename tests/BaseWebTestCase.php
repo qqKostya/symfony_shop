@@ -30,7 +30,6 @@ abstract class BaseWebTestCase extends WebTestCase
         $user->setPhone($data['phone']);
         $user->setPasswordHash(password_hash($data['password'], PASSWORD_BCRYPT));
 
-        // Ищем, существует ли уже роль в базе данных
         $roleName = $isAdmin ? 'ROLE_ADMIN' : 'ROLE_USER';
         $roleRepository = $entityManager->getRepository(Role::class);
         $role = $roleRepository->findOneBy(['name' => $roleName]);
@@ -40,7 +39,6 @@ abstract class BaseWebTestCase extends WebTestCase
             $entityManager->persist($role);
         }
 
-        // Добавляем роль пользователю
         $user->addRole($role);
 
         $entityManager->persist($user);

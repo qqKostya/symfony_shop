@@ -18,22 +18,18 @@ final class OrderControllerTest extends BaseWebTestCase
 
     private $user;
 
-    private $product;
-
-    // Метод для создания заказов
     private function createOrder($user, array $orderData): Order
     {
         $entityManager = self::getContainer()->get('doctrine')->getManager();
 
         $order = new Order(
             $user,
-            OrderStatus::PAID, // Статус по умолчанию
+            OrderStatus::PAID,
             $orderData['deliveryAddress'],
             $orderData['deliveryType'],
         );
         $entityManager->persist($order);
 
-        // Добавляем товары в заказ
         foreach ($orderData['items'] as $itemData) {
             $product = self::getContainer()->get('doctrine')->getRepository(Product::class)->find($itemData['productId']);
             $orderItem = new OrderItem();
@@ -48,7 +44,6 @@ final class OrderControllerTest extends BaseWebTestCase
         return $order;
     }
 
-    // Метод для создания клиента и аутентификации
     private function createAuthenticatedClientForTest(): void
     {
         $this->client = $this->createAuthenticatedClient(true);
@@ -57,10 +52,8 @@ final class OrderControllerTest extends BaseWebTestCase
 
     public function testGetOrders(): void
     {
-        // Создаем аутентифицированного клиента
         $this->createAuthenticatedClientForTest();
 
-        // Создаем заказ для пользователя
         $orderData = [
             'deliveryAddress' => ['kladrId' => '12345', 'fullAddress' => 'Some Address'],
             'deliveryType' => DeliveryType::COURIER,
@@ -70,11 +63,9 @@ final class OrderControllerTest extends BaseWebTestCase
         ];
         $this->createOrder($this->user, $orderData);
 
-        // Запрос на получение всех заказов пользователя
         $this->client->jsonRequest('GET', '/api/orders');
         $responseData = json_decode($this->client->getResponse()->getContent(), true);
 
-        // Проверка статуса и данных
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
         self::assertNotEmpty($responseData);
         self::assertArrayHasKey('id', $responseData[0]);
@@ -82,10 +73,8 @@ final class OrderControllerTest extends BaseWebTestCase
 
     public function testGetOrder(): void
     {
-        // Создаем аутентифицированного клиента
         $this->createAuthenticatedClientForTest();
 
-        // Создаем заказ для пользователя
         $orderData = [
             'deliveryAddress' => ['kladrId' => '12345', 'fullAddress' => 'Some Address'],
             'deliveryType' => DeliveryType::COURIER,
@@ -96,55 +85,45 @@ final class OrderControllerTest extends BaseWebTestCase
         $order = $this->createOrder($this->user, $orderData);
         $orderId = $order->getId();
 
-        // Запрос на получение заказа
         $this->client->jsonRequest('GET', '/api/orders/' . $orderId);
         $responseData = json_decode($this->client->getResponse()->getContent(), true);
 
-        // Проверка статуса и данных
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
         self::assertEquals($orderId, $responseData['id']);
     }
 
     public function testCreateOrder(): void
     {
-        // Создаем аутентифицированного клиента
         $this->createAuthenticatedClientForTest();
 
-        // Создаем заказ для пользователя
         $orderData = [
             'userId' => $this->user->getId(),
-            'status' => OrderStatus::PAID, // Статус для нового заказа
+            'status' => OrderStatus::PAID,
             'deliveryType' => DeliveryType::COURIER,
             'deliveryAddress' => [
                 'kladrId' => 12345,
                 'fullAddress' => 'Some Address',
             ],
             'items' => [
-                ['productId' => 1, 'quantity' => 2], // Пример товара в заказе
+                ['productId' => 1, 'quantity' => 2],
             ],
         ];
 
-        // Запрос на создание нового заказа
         $this->client->jsonRequest('POST', '/api/orders', $orderData);
         $responseData = json_decode($this->client->getResponse()->getContent(), true);
 
 
-        // Проверка, что статус ответа успешный
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
 
-        // Проверка, что ответ содержит идентификатор заказа
         self::assertArrayHasKey('order_id', $responseData);
 
-        // Проверка, что в ответе есть товары
         self::assertArrayHasKey('items', $responseData);
     }
 
     public function testUpdateOrderStatus(): void
     {
-        // Создаем аутентифицированного клиента
         $this->createAuthenticatedClientForTest();
 
-        // Создаем заказ для пользователя
         $orderData = [
             'deliveryAddress' => ['kladrId' => 12345, 'fullAddress' => 'Some Address'],
             'deliveryType' => DeliveryType::COURIER,
@@ -155,7 +134,6 @@ final class OrderControllerTest extends BaseWebTestCase
         $order = $this->createOrder($this->user, $orderData);
         $orderId = $order->getId();
 
-        // Данные для запроса на обновление статуса
         $statusData = [
             'userId' => $this->user->getId(),
             'orderId' => $orderId,
@@ -163,20 +141,15 @@ final class OrderControllerTest extends BaseWebTestCase
         ];
 
 
-        // Отправляем PATCH запрос для обновления статуса заказа
         $this->client->jsonRequest('PATCH', '/api/admin/orders', $statusData);
         $responseData = json_decode($this->client->getResponse()->getContent(), true);
 
-        // Проверка, что статус ответа успешный
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
 
-        // Проверка, что сообщение о статусе было обновлено
         self::assertStringContainsString('в сборке', $responseData['message']);
 
-        // Проверка, что сообщение нужный id заказа
         self::assertStringContainsString((string) $orderId, $responseData['message']);
 
-        // Проверка, что статус заказа был обновлен
         $updatedOrder = self::getContainer()->get('doctrine')->getRepository(Order::class)->find($orderId);
         self::assertEquals(OrderStatus::ASSEMBLING, $updatedOrder->getStatus());
     }

@@ -20,7 +20,6 @@ final class CreateOrderRequest
     public string $status;
 
     #[Assert\NotBlank(message: 'Тип доставки обязателен')]
-    // #[Assert\Choice(callback: [DeliveryType::class, 'cases'], message: "Недопустимый тип доставки")]
     #[Assert\Choice(callback: [DeliveryType::class, 'getValues'], message: 'Недопустимый статус доставки')]
     public string $deliveryType;
 
@@ -28,15 +27,12 @@ final class CreateOrderRequest
     #[Assert\Valid]
     public DeliveryAddressRequest $deliveryAddress;
 
-    // #[Assert\NotBlank(message: "Товары в заказе обязательны")]
-    // #[Assert\Valid]
-    // public CreateOrderItemsCollectionRequest $items;
     #[Assert\NotBlank(message: 'Товары в заказе обязательны')]
     #[Assert\Count(min: 1, minMessage: 'В заказе должен быть хотя бы один товар')]
     #[Assert\Count(max: 20, maxMessage: 'В заказе не может быть более 20 позиций')]
     #[Assert\Valid]
-    #[SerializedName('items')]  // Используем SerializedName для правильной обработки имени свойства
-    public array $items;  // Это будет массив объектов CreateOrderItemsRequest
+    #[SerializedName('items')]
+    public array $items;
 
     public function __construct(
         int $userId,

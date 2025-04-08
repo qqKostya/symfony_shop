@@ -14,21 +14,16 @@ final class ProductControllerTest extends BaseWebTestCase
     {
         $client = $this->createAuthenticatedClient(true);
 
-        // Запрос на получение списка продуктов
         $client->jsonRequest('GET', '/api/products');
 
-        // Проверка статуса ответа
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
 
         $responseData = json_decode($client->getResponse()->getContent(), true);
 
-        // Проверка, что нет ошибок в ответе
         if (isset($responseData['error'])) {
-            // Если есть ошибка, то выводим её
             self::fail('Error response: ' . json_encode($responseData['error']));
         }
 
-        // Проверка, что ответ - это массив продуктов
         self::assertIsArray($responseData);
     }
 
@@ -36,20 +31,15 @@ final class ProductControllerTest extends BaseWebTestCase
     {
         $client = $this->createAuthenticatedClient(true);
 
-        // Генерация случайных данных для продукта
         $data = $this->generateRandomProductData();
 
-        // Создание продукта через новый метод
         $product = $this->createProduct($data);
 
-        // Получение ID продукта
         $productId = $product->getId();
 
-        // Запрос на получение созданного продукта
         $client->jsonRequest('GET', "/api/products/{$productId}");
         $responseData = json_decode($client->getResponse()->getContent(), true);
 
-        // Проверка, что продукт был успешно создан
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
         self::assertEquals($data['name'], $responseData['name']);
     }
@@ -58,18 +48,14 @@ final class ProductControllerTest extends BaseWebTestCase
     {
         $client = $this->createAuthenticatedClient(true);
 
-        // Генерация случайных данных для продукта
         $data = $this->generateRandomProductData();
 
-        // Создание нового продукта
         $product = $this->createProduct($data);
         $productId = $product->getId();
 
-        // Запрос на получение продукта по ID
         $client->jsonRequest('GET', "/api/products/{$productId}");
         $responseData = json_decode($client->getResponse()->getContent(), true);
 
-        // Проверка статуса ответа
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
         self::assertEquals($productId, $responseData['id']);
     }
@@ -78,11 +64,9 @@ final class ProductControllerTest extends BaseWebTestCase
     {
         $client = $this->createAuthenticatedClient(true);
 
-        // Запрос на несуществующий продукт
         $client->jsonRequest('GET', '/api/products/999999');
         $responseData = json_decode($client->getResponse()->getContent(), true);
 
-        // Проверка статуса ответа
         $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
         self::assertArrayHasKey('error', $responseData);
     }
@@ -91,25 +75,20 @@ final class ProductControllerTest extends BaseWebTestCase
     {
         $client = $this->createAuthenticatedClient(true);
 
-        // Генерация случайных данных для продукта
         $data = $this->generateRandomProductData();
 
-        // Создание нового продукта
         $product = $this->createProduct($data);
         $productId = $product->getId();
 
-        // Новые данные для обновления
         $updatedData = [
             'name' => 'Updated Product',
             'cost' => 150,
             'tax' => 30,
         ];
 
-        // Отправка запроса на обновление продукта
         $client->jsonRequest('PUT', "/api/products/{$productId}", $updatedData);
         $responseData = json_decode($client->getResponse()->getContent(), true);
 
-        // Проверка статуса ответа
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
         self::assertEquals($updatedData['name'], $responseData['name']);
         self::assertEquals($updatedData['cost'], $responseData['cost']);
@@ -119,18 +98,14 @@ final class ProductControllerTest extends BaseWebTestCase
     {
         $client = $this->createAuthenticatedClient(true);
 
-        // Генерация случайных данных для продукта
         $data = $this->generateRandomProductData();
 
-        // Создание нового продукта
         $product = $this->createProduct($data);
         $productId = $product->getId();
 
-        // Запрос на удаление продукта
         $client->jsonRequest('DELETE', "/api/products/{$productId}");
         $this->assertResponseStatusCodeSame(Response::HTTP_NO_CONTENT);
 
-        // Запрос на удаленный продукт
         $client->jsonRequest('GET', "/api/products/{$productId}");
         $responseData = json_decode($client->getResponse()->getContent(), true);
 
@@ -146,7 +121,6 @@ final class ProductControllerTest extends BaseWebTestCase
      */
     private function createProduct(array $data): Product
     {
-        // Создание нового продукта
         $product = new Product();
         $product->setName($data['name']);
         $product->setDescription($data['description']);
@@ -157,7 +131,6 @@ final class ProductControllerTest extends BaseWebTestCase
         $product->setWidth($data['width']);
         $product->setLength($data['length']);
 
-        // Получение Entity Manager через контейнер
         $entityManager = self::getContainer()->get('doctrine')->getManager();
         $entityManager->persist($product);
         $entityManager->flush();
