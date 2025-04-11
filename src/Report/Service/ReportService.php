@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Report\Service;
 
 use App\Order\Entity\Enum\OrderStatus;
+use App\Report\Kafka\KafkaProducer;
 use Doctrine\ORM\EntityManagerInterface;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -49,6 +50,8 @@ final class ReportService
         }
 
         fclose($file);
+
+        $this->completeReportGeneration($reportId);
     }
 
     private function getSoldItems(): array

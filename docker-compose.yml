@@ -1,4 +1,3 @@
-version: "3.8"
 services:
   app:
     build: .
@@ -12,6 +11,9 @@ services:
       - kafka
     networks:
       - shop-net
+    environment:
+      KAFKA_BROKER: kafka:9092
+      KAFKA_TOPIC: report-topic
 
   web:
     image: nginx:latest
