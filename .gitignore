@@ -88,7 +88,7 @@
 ###> friendsofphp/php-cs-fixer ###
 /test.php
 /.php-cs-fixer.cache
-/.php-cs-fixer.dist.php
+#/.php-cs-fixer.dist.php
 ###< friendsofphp/php-cs-fixer ###
 
 /var/reports/
