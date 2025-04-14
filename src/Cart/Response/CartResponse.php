@@ -12,17 +12,13 @@ final class CartResponse
     #[Groups(['cart_read'])]
     public int $cart_id;
 
+    /** @var CartItemResponse[] */
     #[Groups(['cart_items_read'])]
     public array $items;
 
     public function __construct(int $cartId, array $cartItems)
     {
         $this->cart_id = $cartId;
-        $this->items = array_map(static fn(CartItem $item) => [
-            'product_id' => $item->getProduct()->getId(),
-            'quantity' => $item->getQuantity(),
-            'created_at' => $item->getCreatedAt()->format('Y-m-d H:i:s'),
-            'updated_at' => $item->getUpdatedAt()->format('Y-m-d H:i:s'),
-        ], $cartItems);
+        $this->items = array_map(static fn(CartItem $item) => new CartItemResponse($item), $cartItems);
     }
 }
