@@ -6,6 +6,7 @@ namespace App\Tests\Product\Controller;
 
 use App\Product\Entity\Product;
 use App\Tests\BaseWebTestCase;
+use App\Tests\Product\Factory\ProductFactory;
 use Symfony\Component\HttpFoundation\Response;
 
 final class ProductControllerTest extends BaseWebTestCase
@@ -31,7 +32,7 @@ final class ProductControllerTest extends BaseWebTestCase
     {
         $client = $this->createAuthenticatedClient(true);
 
-        $data = $this->generateRandomProductData();
+        $data = ProductFactory::create();
 
         $product = $this->createProduct($data);
 
@@ -48,7 +49,7 @@ final class ProductControllerTest extends BaseWebTestCase
     {
         $client = $this->createAuthenticatedClient(true);
 
-        $data = $this->generateRandomProductData();
+        $data = ProductFactory::create();
 
         $product = $this->createProduct($data);
         $productId = $product->getId();
@@ -75,7 +76,7 @@ final class ProductControllerTest extends BaseWebTestCase
     {
         $client = $this->createAuthenticatedClient(true);
 
-        $data = $this->generateRandomProductData();
+        $data = ProductFactory::create();
 
         $product = $this->createProduct($data);
         $productId = $product->getId();
@@ -98,7 +99,7 @@ final class ProductControllerTest extends BaseWebTestCase
     {
         $client = $this->createAuthenticatedClient(true);
 
-        $data = $this->generateRandomProductData();
+        $data = ProductFactory::create();
 
         $product = $this->createProduct($data);
         $productId = $product->getId();
@@ -136,22 +137,5 @@ final class ProductControllerTest extends BaseWebTestCase
         $entityManager->flush();
 
         return $product;
-    }
-
-    /**
-     * Генерация случайных данных для продукта.
-     */
-    private function generateRandomProductData(): array
-    {
-        return [
-            'name' => 'Product ' . random_int(1000, 9999),
-            'description' => 'Description for product ' . random_int(1000, 9999),
-            'cost' => random_int(10, 1000),
-            'tax' => random_int(5, 200),
-            'weight' => random_int(1, 50),
-            'height' => random_int(10, 100),
-            'width' => random_int(10, 100),
-            'length' => random_int(10, 100),
-        ];
     }
 }

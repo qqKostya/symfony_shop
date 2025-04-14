@@ -78,6 +78,7 @@
         }
     },
     "require-dev": {
+        "fakerphp/faker": "^1.24",
         "friendsofphp/php-cs-fixer": "^3.73",
         "phpunit/phpunit": "^12.0",
         "phpyh/coding-standard": "^2.6",
