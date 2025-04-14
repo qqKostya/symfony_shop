@@ -24,7 +24,7 @@ final class CartControllerTest extends BaseWebTestCase
             $entityManager->persist($cart);
             $entityManager->flush();
 
-            $product = self::getContainer()->get('doctrine')->getRepository(Product::class)->find(1);
+            $product = $this->getProduct();
 
             if ($product) {
                 $cartItem = new CartItem(
@@ -32,9 +32,6 @@ final class CartControllerTest extends BaseWebTestCase
                     $product,
                     2,
                 );
-                //                $cartItem->setCart($cart);
-                //                $cartItem->setProduct($product);
-                //                $cartItem->setQuantity(2);
 
                 $entityManager->persist($cartItem);
                 $entityManager->flush();
@@ -64,59 +61,45 @@ final class CartControllerTest extends BaseWebTestCase
     {
         $client = $this->createAuthenticatedClient(true);
 
-        $product = self::getContainer()->get('doctrine')->getRepository(Product::class)->find(1);
+        $product = $this->getProduct();
 
-        $productData = [
-            'productId' => $product->getId(),
-            'quantity' => 1,
-        ];
+        $this->addItemToCart($client, $product->getId(), 1);
 
-        $client->jsonRequest('POST', '/api/cart/add', $productData);
         $responseData = json_decode($client->getResponse()->getContent(), true);
 
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
-
         self::assertNotEmpty($responseData['items']);
     }
 
     public function testRemoveItemFromCart(): void
     {
         $client = $this->createAuthenticatedClient(true);
+        $product = $this->getProduct();
 
-        $product = self::getContainer()->get('doctrine')->getRepository(Product::class)->find(1);
-        $productData = [
-            'productId' => $product->getId(),
-            'quantity' => 3,
-        ];
+        $this->addItemToCart($client, $product->getId(), 3);
 
-        $client->jsonRequest('POST', '/api/cart/add', $productData);
-        $responseData = json_decode($client->getResponse()->getContent(), true);
+        $response = $client->getResponse();
+        $cartData = json_decode($response->getContent(), true);
 
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
-        self::assertNotEmpty($responseData['items']);
+        self::assertNotEmpty($cartData['items']);
 
-        $quantity = $responseData['items'][0]['quantity'];
+        $initialQuantity = $cartData['items'][0]['quantity'];
 
-        $cartItemIdToModify = $responseData['items'][0]['product_id'];
+        $this->removeItemFromCart($client, $product->getId(), 1);
 
-        $productDataToModify = [
-            'productId' => $cartItemIdToModify,
-            'quantity' => 1,
-        ];
-
-        $client->jsonRequest('POST', '/api/cart/remove', $productDataToModify);
-        $responseDataAfterModify = json_decode($client->getResponse()->getContent(), true);
+        $responseAfter = $client->getResponse();
+        $updatedData = json_decode($responseAfter->getContent(), true);
 
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
-
-        self::assertEquals($quantity - 1, $responseDataAfterModify['items'][0]['quantity']);
+        self::assertEquals($initialQuantity - 1, $updatedData['items'][0]['quantity']);
     }
 
     public function testClearCart(): void
     {
         $client = $this->createAuthenticatedClient(true);
 
-        $product = self::getContainer()->get('doctrine')->getRepository(Product::class)->find(1);
+        $product = $this->getProduct();
 
         $productData = [
             'productId' => $product->getId(),
@@ -131,5 +114,26 @@ final class CartControllerTest extends BaseWebTestCase
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
 
         self::assertEmpty($responseData['items']);
+    }
+
+    private function addItemToCart($client, int $productId, int $quantity): void
+    {
+        $client->jsonRequest('POST', '/api/cart/add', [
+            'productId' => $productId,
+            'quantity' => $quantity,
+        ]);
+    }
+
+    private function removeItemFromCart($client, int $productId, int $quantity): void
+    {
+        $client->jsonRequest('POST', '/api/cart/remove', [
+            'productId' => $productId,
+            'quantity' => $quantity,
+        ]);
+    }
+
+    private function getProduct(int $id = 1): ?Product
+    {
+        return self::getContainer()->get('doctrine')->getRepository(Product::class)->find($id);
     }
 }
