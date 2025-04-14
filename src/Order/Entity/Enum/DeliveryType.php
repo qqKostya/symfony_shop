@@ -6,14 +6,7 @@ namespace App\Order\Entity\Enum;
 
 enum DeliveryType: string
 {
+    use EnumValuesTrait;
     case SELF_DELIVERY = 'самовывоз';
     case COURIER       = 'курьер';
-
-    public static function getValues(): array
-    {
-        return [
-            self::SELF_DELIVERY->value,
-            self::COURIER->value,
-        ];
-    }
 }
