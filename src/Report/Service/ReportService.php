@@ -7,12 +7,9 @@ namespace App\Report\Service;
 use App\Order\Entity\Enum\OrderStatus;
 use App\Report\Kafka\KafkaProducer;
 use Doctrine\ORM\EntityManagerInterface;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 final class ReportService
 {
@@ -81,37 +78,15 @@ final class ReportService
 
     public function getReportFile(string $reportId): Response
     {
-        $soldItems = $this->getSoldItems();
         $filePath = $this->getReportFilePath($reportId);
 
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-
-        $sheet->setCellValue('A1', 'ID заказа');
-        $sheet->setCellValue('B1', 'ID пользователя');
-        $sheet->setCellValue('C1', 'Название товара');
-        $sheet->setCellValue('D1', 'Цена');
-        $sheet->setCellValue('E1', 'Количество');
-
-        $row = 2;
-        foreach ($soldItems as $item) {
-            $sheet->setCellValue("A{$row}", $item['order_id']);
-            $sheet->setCellValue("B{$row}", $item['user_id']);
-            $sheet->setCellValue("C{$row}", $item['product_name']);
-            $sheet->setCellValue("D{$row}", $item['price']);
-            $sheet->setCellValue("E{$row}", $item['amount']);
-            ++$row;
+        if (!$this->filesystem->exists($filePath)) {
+            return new Response('Файл отчёта не найден', Response::HTTP_NOT_FOUND);
         }
 
-        $writer = new Xlsx($spreadsheet);
-        $writer->save($filePath);
-
-        $response = new BinaryFileResponse($filePath);
-        $response->setContentDisposition(
-            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            "{$reportId}.xlsx",
-        );
-
-        return $response;
+        return new BinaryFileResponse($filePath, Response::HTTP_OK, [
+            'Content-Type' => 'application/jsonl',
+            'Content-Disposition' => "attachment; filename=\"{$reportId}.jsonl\"",
+        ]);
     }
 }
