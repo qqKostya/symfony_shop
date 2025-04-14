@@ -40,8 +40,7 @@ final class CartService
 
         $cart = $this->getCartByUser($user);
         if (!$cart) {
-            $cart = new Cart();
-            $cart->setUser($user);
+            $cart = new Cart($user);
             $this->entityManager->persist($cart);
         }
 

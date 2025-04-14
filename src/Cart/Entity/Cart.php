@@ -46,8 +46,9 @@ class Cart
     #[ORM\OneToMany(targetEntity: CartItem::class, mappedBy: 'cart', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $items;
 
-    public function __construct()
+    public function __construct(User $user)
     {
+        $this->user = $user;
         $this->items = new ArrayCollection();
     }
 
@@ -59,11 +60,6 @@ class Cart
     public function getUser(): User
     {
         return $this->user;
-    }
-
-    public function setUser(User $user): void
-    {
-        $this->user = $user;
     }
 
     public function getCreatedAt(): \DateTimeImmutable

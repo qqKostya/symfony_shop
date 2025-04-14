@@ -19,8 +19,7 @@ final class CartControllerTest extends BaseWebTestCase
         $cart = $entityManager->getRepository(Cart::class)->findOneBy(['user' => $user]);
 
         if (!$cart) {
-            $cart = new Cart();
-            $cart->setUser($user);
+            $cart = new Cart($user);
 
             $entityManager->persist($cart);
             $entityManager->flush();
