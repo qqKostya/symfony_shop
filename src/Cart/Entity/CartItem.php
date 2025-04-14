@@ -48,6 +48,13 @@ class CartItem
     #[Groups([SerializationGroups::CART_READ])]
     private \DateTimeImmutable $updatedAt;
 
+    public function __construct(Cart $cart, Product $product, int $quantity)
+    {
+        $this->cart = $cart;
+        $this->product = $product;
+        $this->quantity = $quantity;
+    }
+
     public function getId(): int
     {
         return $this->id;
@@ -91,5 +98,15 @@ class CartItem
     public function getUpdatedAt(): \DateTimeImmutable
     {
         return $this->updatedAt;
+    }
+
+    public function increaseQuantity(int $amount): void
+    {
+        $this->quantity += $amount;
+    }
+
+    public function decreaseQuantity(int $amount): void
+    {
+        $this->quantity -= $amount;
     }
 }

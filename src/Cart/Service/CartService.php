@@ -18,10 +18,12 @@ final class CartService
 
     private EntityManagerInterface $entityManager;
 
-    public function __construct(CartRepository $cartRepository, EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        CartRepository $cartRepository,
+        EntityManagerInterface $entityManager,
+    ) {
         $this->cartRepository = $cartRepository;
-        $this->entityManager  = $entityManager;
+        $this->entityManager = $entityManager;
     }
 
     public function getCartByUser(?User $user): ?Cart
@@ -31,62 +33,55 @@ final class CartService
 
     public function addItemToCart(User $user, CartItemRequest $request): void
     {
-        $cart    = $this->getCartByUser($user);
         $product = $this->entityManager->getRepository(Product::class)->find($request->productId);
+        if (!$product) {
+            throw new \InvalidArgumentException('Product not found');
+        }
 
+        $cart = $this->getCartByUser($user);
         if (!$cart) {
             $cart = new Cart();
             $cart->setUser($user);
-            $this->cartRepository->save($cart);
+            $this->entityManager->persist($cart);
         }
 
-        $existingItem = $this->entityManager->getRepository(CartItem::class)->findOneBy(['cart' => $cart, 'product' => $product]);
+        $cart->addItem($product, $request->quantity);
 
-        if ($existingItem) {
-            $existingItem->setQuantity($existingItem->getQuantity() + $request->quantity);
-            $this->entityManager->persist($existingItem);
-        } else {
-            $item = new CartItem();
-            $item->setCart($cart);
-            $item->setProduct($product);
-            $item->setQuantity($request->quantity);
-            $this->entityManager->persist($item);
-        }
-
+        $this->entityManager->persist($cart);
         $this->entityManager->flush();
     }
 
-    /**
-     * @throws \Exception
-     */
     public function removeItemFromCart(User $user, CartItemRequest $request): void
     {
-        $cart         = $this->getCartByUser($user);
-        $product      = $this->entityManager->getRepository(Product::class)->find($request->productId);
-        $existingItem = $this->entityManager->getRepository(CartItem::class)->findOneBy(['cart' => $cart, 'product' => $product]);
-
-        if ($existingItem) {
-            if (($existingItem->getQuantity() - $request->quantity) > 0) {
-                $existingItem->setQuantity($existingItem->getQuantity() - $request->quantity);
-                $this->entityManager->persist($existingItem);
-            } else {
-                $this->entityManager->remove($existingItem);
-            }
-            $this->entityManager->flush();
-        } else {
-            throw new \Exception('Товар не найден в корзине');
+        $cart = $this->getCartByUser($user);
+        if (!$cart) {
+            throw new \RuntimeException('Cart not found');
         }
+
+        $product = $this->entityManager->getRepository(Product::class)->find($request->productId);
+        if (!$product) {
+            throw new \InvalidArgumentException('Product not found');
+        }
+
+        $cart->removeItem($product, $request->quantity);
+
+        $this->entityManager->flush();
     }
 
     public function deleteCart(User $user): void
     {
         $cart = $this->getCartByUser($user);
-        $this->entityManager->remove($cart);
-        $this->entityManager->flush();
+        if ($cart) {
+            $this->entityManager->remove($cart);
+            $this->entityManager->flush();
+        }
     }
 
+    /**
+     * @return CartItem[]
+     */
     public function getItemsFromCart(Cart $cart): array
     {
-        return $this->entityManager->getRepository(CartItem::class)->findBy(['cart' => $cart]);
+        return $cart->getItems()->toArray();
     }
 }

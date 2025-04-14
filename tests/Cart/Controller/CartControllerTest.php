@@ -28,10 +28,14 @@ final class CartControllerTest extends BaseWebTestCase
             $product = self::getContainer()->get('doctrine')->getRepository(Product::class)->find(1);
 
             if ($product) {
-                $cartItem = new CartItem();
-                $cartItem->setCart($cart);
-                $cartItem->setProduct($product);
-                $cartItem->setQuantity(2);
+                $cartItem = new CartItem(
+                    $cart,
+                    $product,
+                    2,
+                );
+                //                $cartItem->setCart($cart);
+                //                $cartItem->setProduct($product);
+                //                $cartItem->setQuantity(2);
 
                 $entityManager->persist($cartItem);
                 $entityManager->flush();
