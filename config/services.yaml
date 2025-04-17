@@ -27,3 +27,8 @@ services:
         arguments:
             $broker: '%env(KAFKA_BROKER)%'
             $topic: '%env(KAFKA_TOPIC)%'
+
+    App\Report\Kafka\KafkaConsumer:
+        arguments:
+            $broker: '%env(KAFKA_BROKER)%'
+            $topicName: '%env(KAFKA_TOPIC)%'

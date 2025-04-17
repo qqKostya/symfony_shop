@@ -66,6 +66,24 @@ services:
     networks:
       - shop-net
 
+  report-worker:
+    build: .
+    container_name: shop-report-worker
+    restart: unless-stopped
+    working_dir: /var/www
+    command: php bin/console app:consume-reports
+    volumes:
+      - .:/var/www
+    depends_on:
+      - kafka
+      - db
+    networks:
+      - shop-net
+    environment:
+      KAFKA_BROKER: kafka:9092
+      KAFKA_TOPIC: report-topic
+
+
 networks:
   shop-net:
     driver: bridge

@@ -28,8 +28,6 @@ final class ReportService
     public function startReportGeneration(): string
     {
         $reportId = uniqid();
-
-        $this->generateReportFile($reportId);
         $this->kafkaProducer->produceReportGenerationEvent($reportId);
 
         return $reportId;
@@ -88,5 +86,12 @@ final class ReportService
             'Content-Type' => 'application/jsonl',
             'Content-Disposition' => "attachment; filename=\"{$reportId}.jsonl\"",
         ]);
+    }
+
+    public function isReportReady(string $reportId): bool
+    {
+        $filePath = $this->getReportFilePath($reportId);
+
+        return $this->filesystem->exists($filePath);
     }
 }
