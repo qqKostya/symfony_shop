@@ -94,3 +94,5 @@
 .phpunit.cache/
 .env.test.local
 .idea/
+compose.override.yaml
+phpunit.xml.dist
