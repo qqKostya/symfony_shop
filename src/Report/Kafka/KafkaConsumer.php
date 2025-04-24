@@ -48,6 +48,7 @@ final class KafkaConsumer
 
             if ($message === null) {
                 $this->logger->error('Received null message, skipping...');
+
                 continue;
             }
 

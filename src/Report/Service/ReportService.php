@@ -7,6 +7,7 @@ namespace App\Report\Service;
 use App\Order\Entity\Enum\OrderStatus;
 use App\Report\Kafka\KafkaProducer;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,9 +20,14 @@ final class ReportService
         private KafkaProducer $kafkaProducer,
         private EntityManagerInterface $entityManager,
         private Filesystem $filesystem,
+        private ParameterBagInterface $parameterBag,
     ) {
-        if (!$this->filesystem->exists(self::REPORTS_DIR)) {
-            $this->filesystem->mkdir(self::REPORTS_DIR);
+        $kernelDir = $this->parameterBag->get('kernel.project_dir');
+
+        $reportsDir = $kernelDir . \DIRECTORY_SEPARATOR . self::REPORTS_DIR;
+
+        if (!$this->filesystem->exists($reportsDir)) {
+            $this->filesystem->mkdir($reportsDir);
         }
     }
 
@@ -71,7 +77,9 @@ final class ReportService
 
     public function getReportFilePath(string $reportId): string
     {
-        return self::REPORTS_DIR . $reportId . '.jsonl';
+        $kernelDir = $this->parameterBag->get('kernel.project_dir');
+
+        return $kernelDir . \DIRECTORY_SEPARATOR . self::REPORTS_DIR . $reportId . '.jsonl';
     }
 
     public function getReportFile(string $reportId): Response
