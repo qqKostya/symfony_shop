@@ -19,16 +19,7 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
+            - '../src/Report/*'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
-
-    App\Report\Kafka\KafkaProducer:
-        arguments:
-            $broker: '%env(KAFKA_BROKER)%'
-            $topic: '%env(KAFKA_TOPIC)%'
-
-    App\Report\Kafka\KafkaConsumer:
-        arguments:
-            $broker: '%env(KAFKA_BROKER)%'
-            $topicName: '%env(KAFKA_TOPIC)%'
