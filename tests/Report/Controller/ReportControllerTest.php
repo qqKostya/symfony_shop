@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Report\Controller;
 
 use App\Tests\BaseWebTestCase;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 final class ReportControllerTest extends BaseWebTestCase
@@ -17,18 +16,51 @@ final class ReportControllerTest extends BaseWebTestCase
 
         $client->jsonRequest('GET', '/api/admin/generate-report');
 
-        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
+        $this->assertResponseStatusCodeSame(Response::HTTP_ACCEPTED);
 
         $response = $client->getResponse();
 
-        self::assertInstanceOf(BinaryFileResponse::class, $response);
+        self::assertInstanceOf(JsonResponse::class, $response);
 
-        $filePath = $response->getFile()->getPathname();
-        self::assertFileExists($filePath);
+        $content = $response->getContent();
+        $data = json_decode($content, true);
+        self::assertArrayHasKey('reportId', $data);
+    }
 
-        $filesystem = new Filesystem();
-        if ($filesystem->exists($filePath)) {
-            $filesystem->remove($filePath);
-        }
+    public function testGetReport(): void
+    {
+        $client = $this->createAuthenticatedClient(true);
+
+        $client->jsonRequest('GET', '/api/admin/generate-report');
+        $this->assertResponseStatusCodeSame(Response::HTTP_ACCEPTED);
+
+        $response = $client->getResponse();
+        self::assertInstanceOf(JsonResponse::class, $response);
+
+        $content = $response->getContent();
+        $data = json_decode($content, true);
+        self::assertArrayHasKey('reportId', $data);
+
+        $reportId = $data['reportId'];
+
+        $attempts = 0;
+        do {
+            $client->jsonRequest('GET', "/api/admin/report/{$reportId}");
+            $response = $client->getResponse();
+
+            if ($response->getStatusCode() === Response::HTTP_ACCEPTED) {
+                sleep(1);
+            }
+
+            ++$attempts;
+        } while ($response->getStatusCode() === Response::HTTP_ACCEPTED && $attempts < 10);
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
+
+        $contentType = $response->headers->get('Content-Type');
+        self::assertSame('application/jsonl', $contentType);
+
+        $contentDisposition = $response->headers->get('Content-Disposition');
+        self::assertStringContainsString("attachment; filename=\"{$reportId}.jsonl\"", $contentDisposition);
     }
 }
