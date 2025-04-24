@@ -13,6 +13,8 @@ final class KafkaProducer
     private Producer $producer;
 
     private ProducerTopic $topic;
+    private const EVENT_REPORT_GENERATION_STARTED = 'report_generation_started';
+    private const EVENT_REPORT_GENERATION_COMPLETED = 'report_generation_completed';
 
     public function __construct(string $broker, string $topic)
     {
@@ -23,9 +25,20 @@ final class KafkaProducer
         $this->topic = $this->producer->newTopic($topic);
     }
 
+    /**
+     * Универсальный метод для отправки событий в Kafka.
+     */
+    public function produceEvent(string $eventType, array $payload): void
+    {
+        $payload['event'] = $eventType;
+        $message = json_encode($payload, JSON_UNESCAPED_UNICODE);
+        $this->topic->produce(RD_KAFKA_PARTITION_UA, 0, $message);
+        $this->producer->flush(1000);
+    }
+
     public function produceReportGenerationEvent(string $reportId): void
     {
-        $this->produce([
+        $this->produceEvent(self::EVENT_REPORT_GENERATION_STARTED, [
             'reportId' => $reportId,
             'status'   => 'started',
         ]);
@@ -33,16 +46,9 @@ final class KafkaProducer
 
     public function produceReportGeneratedEvent(string $reportId): void
     {
-        $this->produce([
+        $this->produceEvent(self::EVENT_REPORT_GENERATION_COMPLETED, [
             'reportId' => $reportId,
             'status'   => 'completed',
         ]);
-    }
-
-    private function produce(array $payload): void
-    {
-        $message = json_encode($payload, JSON_UNESCAPED_UNICODE);
-        $this->topic->produce(RD_KAFKA_PARTITION_UA, 0, $message);
-        $this->producer->flush(1000);
     }
 }
