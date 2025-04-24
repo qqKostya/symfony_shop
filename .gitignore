@@ -96,3 +96,4 @@
 .idea/
 compose.override.yaml
 phpunit.xml.dist
+/public/var/reports/
