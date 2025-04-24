@@ -16,11 +16,10 @@ final class Kernel extends BaseKernel
 
     protected function build(ContainerBuilder $container): void
     {
-        // Загружаем общие сервисы и конфигурацию
         parent::build($container);
 
-        // Явно указываем путь к конфигурации для Report
-        $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__) . '/src/Report'));
+        // Загружаем только конфиг Kafka-компонентов
+        $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__) . '/src/Report/Kafka'));
         $loader->load('di.php');
     }
 }

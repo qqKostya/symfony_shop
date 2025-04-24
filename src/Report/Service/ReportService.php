@@ -33,7 +33,7 @@ final class ReportService
         return $reportId;
     }
 
-    private function generateReportFile(string $reportId): void
+    public function generateReportFile(string $reportId): void
     {
         $soldItems = $this->getSoldItems();
 
